@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base de Datos II - Atequipa Porta Jhovany</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #7c3aed, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.7s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .scale-in {
+            animation: scaleIn 0.3s ease-out forwards;
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .check-active {
+            background-color: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 transition-colors duration-300">
+    <!-- Fondo Decorativo -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-violet-500/10 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/10 blur-[120px] rounded-full"></div>
+    </div>
+
+    <!-- Encabezado -->
+    <header class="relative z-10 px-6 pt-16 pb-12 max-w-6xl mx-auto space-y-12">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+            <!-- Identidad Institucional -->
+            <div class="flex items-center gap-4 group">
+                <div class="w-14 h-14 bg-white/40 border border-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md shadow-xl overflow-hidden relative border border-white/40">
+                    <img id="univ-logo" src="img/logo.png" alt="Logo Universidad" class="w-full h-full object-contain p-1 transition-opacity">
+                </div>
+                <div class="h-10 w-[1px] bg-slate-200"></div>
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Facultad de Ingeniería</p>
+                    <p class="text-[11px] font-bold text-slate-700 tracking-tight">Sistemas y Computación</p>
+                </div>
+            </div>
+
+            <!-- Identidad Personal -->
+            <div class="flex items-center gap-4 self-end md:self-center text-right group">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Estudiante de Ingeniería</p>
+                    <p class="text-[11px] font-bold text-slate-700 tracking-tight">Atequipa Porta Jhovany</p>
+                </div>
+                <div class="h-10 w-[1px] bg-slate-200"></div>
+                <div class="w-14 h-14 bg-white/40 border border-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md shadow-xl overflow-hidden relative border border-white/40">
+                    <img id="student-photo" src="img/perfil.jpg" alt="Tu Foto" class="w-full h-full object-cover transition-opacity">
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-10">
+            <div class="space-y-4">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/50 border border-white/20 rounded-full backdrop-blur-md shadow-sm">
+                    <i data-lucide="database" class="w-3.5 h-3.5 text-violet-500"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Database Engineering II</span>
+                </div>
+                <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-slate-900 leading-[0.9]">
+                    Base de <br> <span class="gradient-text">Datos II.</span>
+                </h1>
+            </div>
+
+            <!-- Widget de Progreso Académico -->
+            <div class="relative p-8 glass-card rounded-[2.5rem] shadow-2xl min-w-[280px]">
+                <div class="flex justify-between items-end mb-4">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Semestre Completado</p>
+                        <h3 id="progress-text" class="text-4xl font-black text-slate-900">0%</h3>
+                    </div>
+                    <i data-lucide="server" class="w-8 h-8 text-violet-500/50"></i>
+                </div>
+                <div class="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-violet-600 to-indigo-500 transition-all duration-1000 ease-out" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegación por Unidades -->
+    <nav class="relative z-20 sticky top-0 bg-slate-50/80 backdrop-blur-md border-y border-slate-200 px-6">
+        <div id="unit-tabs" class="max-w-6xl mx-auto flex gap-2 overflow-x-auto py-2 no-scrollbar"></div>
+    </nav>
+
+    <!-- Área de Contenido Dinámico -->
+    <main id="main-content" class="relative z-10 max-w-6xl mx-auto px-6 py-16 min-h-[400px]"></main>
+
+    <!-- Pie de página -->
+    <footer class="max-w-6xl mx-auto px-6 py-20 text-center">
+        <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent mb-10"></div>
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em]">
+            Ingeniería de Sistemas // Base de Datos II // Portafolio Académico // GitHub Integration
+        </p>
+    </footer>
+
+    <script>
+        // --- CONFIGURACIÓN DE GITHUB ---
+        const GITHUB_BASE_URL = "https://github.com/Jhovany2/Base-de-Datos-II/tree/main/";
+
+        let units = JSON.parse(localStorage.getItem('db2_portfolio_v3')) || [
+            { number: 1, title: "Optimización y Transacciones", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 1, completed: false })) },
+            { number: 2, title: "Programación en Servidor", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 5, completed: false })) },
+            { number: 3, title: "Bases de Datos NoSQL", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 9, completed: false })) },
+            { number: 4, title: "Administración y Seguridad", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 13, completed: false })) }
+        ];
+
+        let selectedUnit = 1;
+
+        function renderTabs() {
+            const container = document.getElementById('unit-tabs');
+            container.innerHTML = units.map(u => `
+                <button onclick="changeUnit(${u.number})" class="px-8 py-4 rounded-2xl text-xs font-bold transition-all whitespace-nowrap tracking-widest uppercase ${selectedUnit === u.number ? 'bg-violet-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-800 hover:bg-white/50'}">
+                    U0${u.number}
+                </button>
+            `).join('');
+        }
+
+        function renderContent() {
+            const container = document.getElementById('main-content');
+            const currentUnit = units.find(u => u.number === selectedUnit);
+            
+            container.innerHTML = `
+                <div class="space-y-12 animate-fade-in">
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-4">
+                            <div class="h-[2px] w-12 bg-violet-600 rounded-full"></div>
+                            <h2 class="text-sm font-black uppercase tracking-[0.3em] text-slate-400">Plan de Estudios</h2>
+                        </div>
+                        <p class="text-2xl font-bold ml-16 text-slate-800">${currentUnit.title}</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        ${currentUnit.weeks.map(w => {
+                            const weekNum = w.number < 10 ? '0' + w.number : w.number;
+                            const cleanBaseUrl = GITHUB_BASE_URL.endsWith('/') ? GITHUB_BASE_URL : GITHUB_BASE_URL + '/';
+                            
+                            // Lógica AUTOMÁTICA para todas las semanas
+                            // Esto genera "Semana 1", "Semana 2", etc.
+                            // encodeURIComponent convierte el espacio en %20 automáticamente
+                            const folderName = `Semana ${w.number}`;
+                            const githubWeekUrl = `${cleanBaseUrl}${encodeURIComponent(folderName)}`;
+                            
+                            return `
+                                <div class="group relative p-8 bg-white border border-slate-200 rounded-[2rem] text-left hover:border-violet-500/50 transition-all hover:shadow-2xl hover:-translate-y-1 overflow-hidden flex flex-col justify-between h-full min-h-[260px]">
+                                    <i data-lucide="layers" class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 group-hover:scale-110 transition-all w-24 h-24"></i>
+                                    
+                                    <div>
+                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Semana</span>
+                                        <h3 class="text-5xl font-black mt-2 text-slate-900 group-hover:text-violet-600 transition-colors">${weekNum}</h3>
+                                        <p class="mt-4 text-[10px] font-bold ${w.completed ? 'text-emerald-500' : 'text-slate-400'} italic">
+                                            ${w.completed ? 'Completado' : 'Pendiente'}
+                                        </p>
+                                    </div>
+
+                                    <div class="mt-8 flex items-center justify-between gap-3 relative z-10">
+                                        <a href="${githubWeekUrl}" target="_blank" class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-violet-600 transition-all shadow-lg">
+                                            <i data-lucide="github" class="w-3.5 h-3.5"></i>
+                                            Rep. GitHub
+                                        </a>
+
+                                        <button onclick="toggleComplete(${w.number})" class="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${w.completed ? 'check-active' : 'border-slate-200 text-slate-300 hover:border-emerald-400 hover:text-emerald-400'}">
+                                            <i data-lucide="${w.completed ? 'check' : 'circle'}" class="w-5 h-5"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+            updateProgress();
+            lucide.createIcons();
+        }
+
+        function changeUnit(n) {
+            selectedUnit = n;
+            renderTabs();
+            renderContent();
+        }
+
+        function toggleComplete(weekNum) {
+            units = units.map(u => ({
+                ...u,
+                weeks: u.weeks.map(w => w.number === weekNum ? { ...w, completed: !w.completed } : w)
+            }));
+            localStorage.setItem('db2_portfolio_v3', JSON.stringify(units));
+            renderContent();
+        }
+
+        function updateProgress() {
+            const total = 16;
+            const completedCount = units.reduce((acc, unit) => 
+                acc + unit.weeks.filter(w => w.completed === true).length, 0
+            );
+            const percentage = Math.round((completedCount / total) * 100);
+            document.getElementById('progress-text').innerText = percentage + '%';
+            document.getElementById('progress-bar').style.width = percentage + '%';
+        }
+
+        window.onload = () => {
+            renderTabs();
+            renderContent();
+        };
+    </script>
+</body>
+</html>
