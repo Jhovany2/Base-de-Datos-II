@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Base de Datos II - Atequipa Porta Jhovany</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Cargamos Lucide Icons desde una fuente confiable -->
+    <!-- Cargamos Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -32,7 +32,7 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
             <div class="flex items-center gap-4 group">
                 <div class="w-14 h-14 bg-white/40 border border-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md shadow-xl overflow-hidden relative">
-                    <img id="univ-logo" src="img/logo.png" alt="Logo Universidad" class="w-full h-full object-contain p-1">
+                    <img id="univ-logo" src="img/logo.png" alt="Logo Universidad" class="w-full h-full object-contain p-1" onerror="this.src='https://placehold.co/100x100/7c3aed/ffffff?text=U'">
                 </div>
                 <div class="h-10 w-[1px] bg-slate-200"></div>
                 <div>
@@ -51,7 +51,7 @@
                     <p class="text-[11px] font-bold text-slate-700 tracking-tight">Atequipa Porta Jhovany</p>
                 </div>
                 <div class="w-14 h-14 bg-white/40 border border-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md shadow-xl overflow-hidden">
-                    <img id="student-photo" src="img/perfil.jpg" alt="Tu Foto" class="w-full h-full object-cover">
+                    <img id="student-photo" src="img/perfil.jpg" alt="Tu Foto" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x600/6366f1/ffffff?text=JP'">
                 </div>
             </div>
         </div>
@@ -120,13 +120,14 @@
             <p id="modal-week-text" class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-8"></p>
             <div class="space-y-6">
                 <div class="p-8 border-2 border-dashed border-slate-200 rounded-[2rem] text-center hover:border-violet-400 transition-all group cursor-pointer bg-slate-50">
-                    <input type="file" id="file-input" class="hidden">
+                    <!-- Añadido onchange="updateFileName(this)" -->
+                    <input type="file" id="file-input" class="hidden" onchange="updateFileName(this)">
                     <label for="file-input" class="cursor-pointer block">
                         <i data-lucide="file-up" class="w-12 h-12 text-slate-300 mx-auto mb-3 group-hover:text-violet-500 transition-colors"></i>
                         <p id="file-name-display" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Seleccionar Archivo</p>
                     </label>
                 </div>
-                <div id="upload-status" class="hidden text-center py-2"><p class="text-[10px] font-black uppercase tracking-widest"></p></div>
+                <div id="upload-status" class="hidden text-center py-2"><p id="upload-status-text" class="text-[10px] font-black uppercase tracking-widest"></p></div>
                 <div class="flex gap-3">
                     <button onclick="closeUploadModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-200">Cancelar</button>
                     <button id="btn-upload" onclick="handleFileUpload()" class="flex-1 py-4 bg-violet-600 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-violet-700 shadow-lg">Subir</button>
@@ -136,24 +137,18 @@
     </div>
 
     <script type="module">
-        // Firebase solo se inicializa si las variables del entorno están presentes
         let db = null;
         let auth = null;
         let appId = 'local-app';
-
-        // Definimos las funciones de Firestore fuera para que sean accesibles globalmente en el módulo
         let f_doc, f_setDoc, f_onSnapshot;
 
         async function initApp() {
-            // Comprobar si estamos en el entorno que provee Firebase automáticamente
             const hasEnv = typeof __firebase_config !== 'undefined';
-            
             if (hasEnv) {
                 const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
                 const { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
                 const { getFirestore, doc, setDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js');
 
-                // Asignamos las funciones importadas a nuestras variables persistentes
                 f_doc = doc;
                 f_setDoc = setDoc;
                 f_onSnapshot = onSnapshot;
@@ -174,7 +169,6 @@
                     if (u) syncFirestoreData();
                 });
             } else {
-                console.log("Modo local activado (Sin Firebase)");
                 loadLocalData();
             }
             renderTabs();
@@ -193,7 +187,6 @@
 
         function syncFirestoreData() {
             if (!f_doc || !f_onSnapshot || !db || !auth?.currentUser) return;
-            
             const userDocRef = f_doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'portfolio', 'data');
             f_onSnapshot(userDocRef, (docSnap) => {
                 if (docSnap.exists()) {
@@ -204,7 +197,7 @@
                         updateProgress();
                     }
                 }
-            }, (err) => console.error("Error sincronizando:", err));
+            });
         }
 
         function loadLocalData() {
@@ -224,37 +217,75 @@
         window.handleFileUpload = async () => {
             const fileInput = document.getElementById('file-input');
             const statusEl = document.getElementById('upload-status');
-            const statusText = statusEl.querySelector('p');
+            const statusText = document.getElementById('upload-status-text');
             const btn = document.getElementById('btn-upload');
-            const repo = localStorage.getItem('gh_repo');
+            let repo = localStorage.getItem('gh_repo');
             const token = localStorage.getItem('gh_token');
 
             if (!fileInput.files[0]) return;
-            if (!repo || !token) return alert("Configura el engranaje primero.");
+            if (!repo || !token) {
+                alert("Configura el repositorio y token en el icono de engranaje superior.");
+                return;
+            }
+
+            repo = repo.replace('https://github.com/', '').replace(/\/$/, '').trim();
 
             statusEl.classList.remove('hidden');
-            statusText.innerText = "Subiendo...";
+            statusText.innerText = "Conectando con GitHub...";
+            statusText.className = "text-[10px] font-black uppercase tracking-widest text-violet-600";
             btn.disabled = true;
 
             const file = fileInput.files[0];
             const reader = new FileReader();
+            
             reader.onload = async () => {
                 const base64Content = reader.result.split(',')[1];
-                const url = `https://api.github.com/repos/${repo}/contents/Semana ${currentWeekToUpload}/${file.name}`;
+                const fileName = file.name;
+                const path = `Semana ${currentWeekToUpload}/${fileName}`;
+                const url = `https://api.github.com/repos/${repo}/contents/${encodeURIComponent(path)}`;
+                
                 try {
+                    let sha = null;
+                    const checkRes = await fetch(url, {
+                        headers: { 'Authorization': `token ${token}` }
+                    });
+                    
+                    if (checkRes.ok) {
+                        const fileData = await checkRes.json();
+                        sha = fileData.sha;
+                    }
+
                     const res = await fetch(url, {
                         method: 'PUT',
-                        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: `Upload week ${currentWeekToUpload}`, content: base64Content })
+                        headers: { 
+                            'Authorization': `token ${token}`, 
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ 
+                            message: `Subida desde Portafolio: ${fileName}`, 
+                            content: base64Content,
+                            sha: sha
+                        })
                     });
+                    
                     if (res.ok) {
                         const data = await res.json();
-                        updateUnitWithFile(currentWeekToUpload, file.name, data.content.html_url);
-                        statusText.innerText = "¡Éxito!";
+                        // Llamamos a la actualización forzada
+                        updateUnitWithFile(currentWeekToUpload, fileName, data.content.html_url);
+                        statusText.innerText = "¡Archivo subido correctamente!";
+                        statusText.className = "text-[10px] font-black uppercase tracking-widest text-emerald-600";
                         setTimeout(closeUploadModal, 1500);
-                    } else { throw new Error(); }
-                } catch (e) { statusText.innerText = "Error de conexión"; }
-                finally { btn.disabled = false; }
+                    } else {
+                        const err = await res.json();
+                        statusText.innerText = `Error GitHub: ${err.message}`;
+                        statusText.className = "text-[10px] font-black uppercase tracking-widest text-rose-600";
+                    }
+                } catch (e) { 
+                    statusText.innerText = "Error de conexión."; 
+                    statusText.className = "text-[10px] font-black uppercase tracking-widest text-rose-600";
+                } finally { 
+                    btn.disabled = false; 
+                }
             };
             reader.readAsDataURL(file);
         };
@@ -262,7 +293,17 @@
         function updateUnitWithFile(weekNum, fileName, fileUrl) {
             units = units.map(u => ({
                 ...u,
-                weeks: u.weeks.map(w => w.number === weekNum ? { ...w, completed: true, activities: [...(w.activities || []), { name: fileName, url: fileUrl }] } : w)
+                weeks: u.weeks.map(w => {
+                    if (w.number === weekNum) {
+                        const activities = w.activities || [];
+                        // Solo añadir si no existe ya un archivo con el mismo nombre en la lista visual
+                        if (!activities.find(a => a.name === fileName)) {
+                            return { ...w, completed: true, activities: [...activities, { name: fileName, url: fileUrl }] };
+                        }
+                        return { ...w, completed: true };
+                    }
+                    return w;
+                })
             }));
             persistData();
             renderContent();
@@ -270,6 +311,17 @@
         }
 
         // --- UI ---
+        window.updateFileName = (input) => {
+            const display = document.getElementById('file-name-display');
+            if (input.files && input.files[0]) {
+                display.innerText = input.files[0].name;
+                display.classList.add('text-violet-600');
+            } else {
+                display.innerText = "Seleccionar Archivo";
+                display.classList.remove('text-violet-600');
+            }
+        };
+
         window.openConfigModal = () => {
             document.getElementById('git-repo').value = localStorage.getItem('gh_repo') || '';
             document.getElementById('git-token').value = localStorage.getItem('gh_token') || '';
@@ -277,13 +329,16 @@
         };
         window.closeConfigModal = () => document.getElementById('config-modal').classList.add('hidden');
         window.saveConfig = () => {
-            localStorage.setItem('gh_repo', document.getElementById('git-repo').value);
-            localStorage.setItem('gh_token', document.getElementById('git-token').value);
+            localStorage.setItem('gh_repo', document.getElementById('git-repo').value.trim());
+            localStorage.setItem('gh_token', document.getElementById('git-token').value.trim());
             closeConfigModal();
         };
         window.openUploadModal = (n) => {
             currentWeekToUpload = n;
             document.getElementById('modal-week-text').innerText = `Semana ${n}`;
+            document.getElementById('file-name-display').innerText = "Seleccionar Archivo";
+            document.getElementById('file-name-display').classList.remove('text-violet-600');
+            document.getElementById('upload-status').classList.add('hidden');
             document.getElementById('upload-modal').classList.remove('hidden');
         };
         window.closeUploadModal = () => document.getElementById('upload-modal').classList.add('hidden');
@@ -313,13 +368,13 @@
                         <div class="group p-8 bg-white border border-slate-200 rounded-[2.5rem] hover:shadow-2xl flex flex-col min-h-[400px]">
                             <div class="flex justify-between items-start mb-6">
                                 <div><span class="text-[10px] font-black text-slate-400 uppercase">Semana</span><h3 class="text-6xl font-black text-slate-900">${w.number < 10 ? '0'+w.number : w.number}</h3></div>
-                                <button onclick="openUploadModal(${w.number})" class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 hover:text-violet-600 flex items-center justify-center shadow-sm"><i data-lucide="plus"></i></button>
+                                <button onclick="openUploadModal(${w.number})" class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 hover:text-violet-600 flex items-center justify-center shadow-sm border border-slate-100"><i data-lucide="plus"></i></button>
                             </div>
                             <div class="flex-1 space-y-3 overflow-y-auto no-scrollbar max-h-[180px] mb-6">
                                 ${(w.activities || []).map(a => `<a href="${a.url}" target="_blank" class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl hover:translate-x-1 transition-all"><i data-lucide="file-text" class="w-3.5 h-3.5 text-violet-500"></i><span class="text-[9px] font-black text-slate-600 uppercase truncate">${a.name}</span></a>`).join('') || '<p class="text-[9px] text-slate-300 text-center py-6 uppercase font-black">Sin entregas</p>'}
                             </div>
                             <button onclick="toggleComplete(${w.number})" class="w-full py-3.5 ${w.completed ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-900 text-white'} rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2">
-                                <i data-lucide="${w.completed ? 'check-circle' : 'circle'}"></i> ${w.completed ? 'Completado' : 'Pendiente'}
+                                <i data-lucide="${w.completed ? 'check-circle' : 'circle'}"></i> ${w.completed ? 'Completado' : 'Marcar'}
                             </button>
                         </div>
                     `).join('')}
