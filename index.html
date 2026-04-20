@@ -5,19 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Base de Datos II - Atequipa Porta Jhovany</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Cargamos Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .glass-card { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); }
         .gradient-text { background: linear-gradient(to right, #7c3aed, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .animate-fade-in { animation: fadeIn 0.7s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .scale-in { animation: scaleIn 0.3s ease-out forwards; }
-        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .modal-backdrop { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
         .gear-spin:hover { transform: rotate(90deg); }
     </style>
@@ -59,8 +55,8 @@
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-10">
             <div class="space-y-4">
                 <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/50 border border-white/20 rounded-full backdrop-blur-md">
-                    <i data-lucide="github" class="w-3.5 h-3.5 text-violet-500"></i>
-                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Gestor de Archivos GitHub API</span>
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-violet-500"></i>
+                    <span id="sync-status-label" class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Sincronización en Tiempo Real</span>
                 </div>
                 <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-slate-900 leading-[0.9]">
                     Base de <br> <span class="gradient-text">Datos II.</span>
@@ -73,7 +69,7 @@
                         <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Semestre Completado</p>
                         <h3 id="progress-text" class="text-4xl font-black text-slate-900">0%</h3>
                     </div>
-                    <i data-lucide="server" class="w-8 h-8 text-violet-500/50"></i>
+                    <i data-lucide="database" class="w-8 h-8 text-violet-500/50"></i>
                 </div>
                 <div class="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
                     <div id="progress-bar" class="h-full bg-gradient-to-r from-violet-600 to-indigo-500 transition-all duration-1000 ease-out" style="width: 0%"></div>
@@ -88,238 +84,168 @@
 
     <main id="main-content" class="relative z-10 max-w-6xl mx-auto px-6 py-16 min-h-[400px]"></main>
 
-    <!-- Modal de Configuración -->
     <div id="config-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center px-4 modal-backdrop">
         <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 scale-in">
-            <div class="flex justify-between items-center mb-8">
-                <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tighter">Configuración</h3>
-                <button onclick="closeConfigModal()" class="text-slate-400 hover:text-slate-900 transition-colors">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
+            <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-8">Configuración</h3>
             <div class="space-y-6">
                 <div>
                     <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Repositorio (Usuario/Repo)</label>
-                    <input type="text" id="git-repo" placeholder="Ej: Jhovany2/Base-de-Datos-II" class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-violet-500 transition-all text-sm font-medium">
+                    <input type="text" id="git-repo" placeholder="Ej: Jhovany2/Base-de-Datos-II" class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:border-violet-500 transition-all text-sm outline-none">
                 </div>
                 <div>
-                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Personal Access Token (PAT)</label>
-                    <input type="password" id="git-token" placeholder="ghp_xxxxxxxxxxxx" class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-violet-500 transition-all text-sm font-medium">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">GitHub Token (PAT)</label>
+                    <input type="password" id="git-token" placeholder="ghp_xxxxxxxxxxxx" class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:border-violet-500 transition-all text-sm outline-none">
                 </div>
-                <button onclick="saveConfig()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-violet-600 transition-all shadow-xl">
-                    Guardar Cambios
-                </button>
+                <button onclick="saveConfig()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-violet-600 transition-all shadow-xl">Guardar y Sincronizar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Subida -->
     <div id="upload-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center px-4 modal-backdrop">
         <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 scale-in">
             <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2">Subir Actividad</h3>
             <p id="modal-week-text" class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-8"></p>
             <div class="space-y-6">
-                <div class="p-8 border-2 border-dashed border-slate-200 rounded-[2rem] text-center hover:border-violet-400 transition-all group cursor-pointer bg-slate-50">
-                    <!-- Añadido onchange="updateFileName(this)" -->
+                <div class="p-8 border-2 border-dashed border-slate-200 rounded-[2rem] text-center hover:border-violet-400 transition-all cursor-pointer bg-slate-50">
                     <input type="file" id="file-input" class="hidden" onchange="updateFileName(this)">
                     <label for="file-input" class="cursor-pointer block">
-                        <i data-lucide="file-up" class="w-12 h-12 text-slate-300 mx-auto mb-3 group-hover:text-violet-500 transition-colors"></i>
+                        <i data-lucide="file-up" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
                         <p id="file-name-display" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Seleccionar Archivo</p>
                     </label>
                 </div>
                 <div id="upload-status" class="hidden text-center py-2"><p id="upload-status-text" class="text-[10px] font-black uppercase tracking-widest"></p></div>
                 <div class="flex gap-3">
-                    <button onclick="closeUploadModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-200">Cancelar</button>
-                    <button id="btn-upload" onclick="handleFileUpload()" class="flex-1 py-4 bg-violet-600 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-violet-700 shadow-lg">Subir</button>
+                    <button onclick="closeUploadModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-2xl font-bold text-xs uppercase tracking-widest">Cancelar</button>
+                    <button id="btn-upload" onclick="handleFileUpload()" class="flex-1 py-4 bg-violet-600 text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-lg">Subir</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        let db = null;
-        let auth = null;
-        let appId = 'local-app';
-        let f_doc, f_setDoc, f_onSnapshot;
+    <script>
+        // Cargar estados manuales de completado desde localStorage
+        const manualStates = JSON.parse(localStorage.getItem('db2_manual_completion')) || {};
 
-        async function initApp() {
-            const hasEnv = typeof __firebase_config !== 'undefined';
-            if (hasEnv) {
-                const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
-                const { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
-                const { getFirestore, doc, setDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js');
-
-                f_doc = doc;
-                f_setDoc = setDoc;
-                f_onSnapshot = onSnapshot;
-
-                const firebaseConfig = JSON.parse(__firebase_config);
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                onAuthStateChanged(auth, (u) => {
-                    if (u) syncFirestoreData();
-                });
-            } else {
-                loadLocalData();
-            }
-            renderTabs();
-            renderContent();
-        }
-
-        let units = JSON.parse(localStorage.getItem('db2_local_data')) || [
-            { number: 1, title: "Optimización y Transacciones", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 1, completed: false, activities: [] })) },
-            { number: 2, title: "Programación en Servidor", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 5, completed: false, activities: [] })) },
-            { number: 3, title: "Bases de Datos NoSQL", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 9, completed: false, activities: [] })) },
-            { number: 4, title: "Administración y Seguridad", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 13, completed: false, activities: [] })) }
+        let units = [
+            { number: 1, title: "Optimización y Transacciones", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 1, completed: manualStates[i+1] || false, activities: [], isLoading: true })) },
+            { number: 2, title: "Programación en Servidor", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 5, completed: manualStates[i+5] || false, activities: [], isLoading: true })) },
+            { number: 3, title: "Bases de Datos NoSQL", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 9, completed: manualStates[i+9] || false, activities: [], isLoading: true })) },
+            { number: 4, title: "Administración y Seguridad", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 13, completed: manualStates[i+13] || false, activities: [], isLoading: true })) }
         ];
 
         let selectedUnit = 1;
         let currentWeekToUpload = null;
+        let isSyncing = false;
 
-        function syncFirestoreData() {
-            if (!f_doc || !f_onSnapshot || !db || !auth?.currentUser) return;
-            const userDocRef = f_doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'portfolio', 'data');
-            f_onSnapshot(userDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (data.units) {
-                        units = data.units;
-                        renderContent();
-                        updateProgress();
-                    }
-                }
-            });
-        }
-
-        function loadLocalData() {
-            const saved = localStorage.getItem('db2_local_data');
-            if (saved) units = JSON.parse(saved);
-        }
-
-        async function persistData() {
-            localStorage.setItem('db2_local_data', JSON.stringify(units));
-            if (db && auth?.currentUser && f_doc && f_setDoc) {
-                const userDocRef = f_doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'portfolio', 'data');
-                await f_setDoc(userDocRef, { units }, { merge: true });
-            }
-        }
-
-        // --- GITHUB API ---
-        window.handleFileUpload = async () => {
-            const fileInput = document.getElementById('file-input');
-            const statusEl = document.getElementById('upload-status');
-            const statusText = document.getElementById('upload-status-text');
-            const btn = document.getElementById('btn-upload');
-            let repo = localStorage.getItem('gh_repo');
+        // --- FUNCIÓN CLAVE: LEER DE GITHUB ---
+        async function syncFromGitHub() {
+            const repo = localStorage.getItem('gh_repo')?.replace('https://github.com/', '').trim();
             const token = localStorage.getItem('gh_token');
-
-            if (!fileInput.files[0]) return;
             if (!repo || !token) {
-                alert("Configura el repositorio y token en el icono de engranaje superior.");
+                units.forEach(u => u.weeks.forEach(w => w.isLoading = false));
+                renderContent();
                 return;
             }
 
-            repo = repo.replace('https://github.com/', '').replace(/\/$/, '').trim();
+            isSyncing = true;
+            document.getElementById('sync-status-label').innerText = "Sincronizando con GitHub...";
+            
+            // Reiniciar actividades pero mantener estado 'completed' manual
+            units.forEach(u => u.weeks.forEach(w => { 
+                w.activities = []; 
+                w.isLoading = true; 
+            }));
+            renderContent();
 
-            statusEl.classList.remove('hidden');
-            statusText.innerText = "Conectando con GitHub...";
-            statusText.className = "text-[10px] font-black uppercase tracking-widest text-violet-600";
+            for (let unit of units) {
+                for (let week of unit.weeks) {
+                    const path = `Semana ${week.number}`;
+                    const url = `https://api.github.com/repos/${repo}/contents/${encodeURIComponent(path)}`;
+                    
+                    try {
+                        const res = await fetch(url, { 
+                            headers: { 'Authorization': `token ${token}` },
+                            cache: 'no-store' 
+                        });
+                        
+                        if (res.ok) {
+                            const files = await res.json();
+                            if (Array.isArray(files)) {
+                                week.activities = files.map(f => ({ name: f.name, url: f.html_url }));
+                                // NOTA: No cambiamos week.completed aquí, ahora es manual.
+                            }
+                        }
+                    } catch (e) { 
+                        console.error(`Error leyendo semana ${week.number}`, e); 
+                    } finally {
+                        week.isLoading = false;
+                    }
+                }
+                renderContent();
+            }
+
+            isSyncing = false;
+            document.getElementById('sync-status-label').innerText = "Sincronización en Tiempo Real con GitHub";
+            updateProgress();
+        }
+
+        // --- GITHUB UPLOAD ---
+        window.handleFileUpload = async () => {
+            const fileInput = document.getElementById('file-input');
+            const statusText = document.getElementById('upload-status-text');
+            const repo = localStorage.getItem('gh_repo')?.replace('https://github.com/', '').trim();
+            const token = localStorage.getItem('gh_token');
+
+            if (!fileInput.files[0] || !repo || !token) return alert("Configura el repositorio y selecciona un archivo.");
+
+            const statusDiv = document.getElementById('upload-status');
+            const btn = document.getElementById('btn-upload');
+            
+            statusDiv.classList.remove('hidden');
+            statusText.innerText = "Subiendo archivo...";
             btn.disabled = true;
-
+            
             const file = fileInput.files[0];
             const reader = new FileReader();
-            
             reader.onload = async () => {
-                const base64Content = reader.result.split(',')[1];
-                const fileName = file.name;
-                const path = `Semana ${currentWeekToUpload}/${fileName}`;
+                const base64 = reader.result.split(',')[1];
+                const path = `Semana ${currentWeekToUpload}/${file.name}`;
                 const url = `https://api.github.com/repos/${repo}/contents/${encodeURIComponent(path)}`;
                 
                 try {
-                    let sha = null;
-                    const checkRes = await fetch(url, {
-                        headers: { 'Authorization': `token ${token}` }
-                    });
-                    
-                    if (checkRes.ok) {
-                        const fileData = await checkRes.json();
-                        sha = fileData.sha;
-                    }
+                    const check = await fetch(url, { headers: { 'Authorization': `token ${token}` } });
+                    const sha = check.ok ? (await check.json()).sha : null;
 
                     const res = await fetch(url, {
                         method: 'PUT',
-                        headers: { 
-                            'Authorization': `token ${token}`, 
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ 
-                            message: `Subida desde Portafolio: ${fileName}`, 
-                            content: base64Content,
-                            sha: sha
-                        })
+                        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: `Upload ${file.name}`, content: base64, sha: sha })
                     });
                     
                     if (res.ok) {
-                        const data = await res.json();
-                        // Llamamos a la actualización forzada
-                        updateUnitWithFile(currentWeekToUpload, fileName, data.content.html_url);
-                        statusText.innerText = "¡Archivo subido correctamente!";
+                        statusText.innerText = "¡Archivo subido!";
                         statusText.className = "text-[10px] font-black uppercase tracking-widest text-emerald-600";
-                        setTimeout(closeUploadModal, 1500);
+                        await syncFromGitHub(); 
+                        setTimeout(closeUploadModal, 1000);
                     } else {
-                        const err = await res.json();
-                        statusText.innerText = `Error GitHub: ${err.message}`;
+                        statusText.innerText = "Error al subir";
                         statusText.className = "text-[10px] font-black uppercase tracking-widest text-rose-600";
                     }
                 } catch (e) { 
-                    statusText.innerText = "Error de conexión."; 
+                    statusText.innerText = "Error de red"; 
                     statusText.className = "text-[10px] font-black uppercase tracking-widest text-rose-600";
-                } finally { 
-                    btn.disabled = false; 
+                } finally {
+                    btn.disabled = false;
                 }
             };
             reader.readAsDataURL(file);
         };
 
-        function updateUnitWithFile(weekNum, fileName, fileUrl) {
-            units = units.map(u => ({
-                ...u,
-                weeks: u.weeks.map(w => {
-                    if (w.number === weekNum) {
-                        const activities = w.activities || [];
-                        // Solo añadir si no existe ya un archivo con el mismo nombre en la lista visual
-                        if (!activities.find(a => a.name === fileName)) {
-                            return { ...w, completed: true, activities: [...activities, { name: fileName, url: fileUrl }] };
-                        }
-                        return { ...w, completed: true };
-                    }
-                    return w;
-                })
-            }));
-            persistData();
-            renderContent();
-            updateProgress();
-        }
-
-        // --- UI ---
-        window.updateFileName = (input) => {
+        // --- UI LOGIC ---
+        window.updateFileName = (input) => { 
             const display = document.getElementById('file-name-display');
-            if (input.files && input.files[0]) {
-                display.innerText = input.files[0].name;
-                display.classList.add('text-violet-600');
-            } else {
-                display.innerText = "Seleccionar Archivo";
-                display.classList.remove('text-violet-600');
-            }
+            display.innerText = input.files[0]?.name || "Seleccionar Archivo"; 
+            display.className = input.files[0] ? "text-[10px] font-black text-violet-600 uppercase tracking-widest" : "text-[10px] font-black text-slate-400 uppercase tracking-widest";
         };
 
         window.openConfigModal = () => {
@@ -327,70 +253,91 @@
             document.getElementById('git-token').value = localStorage.getItem('gh_token') || '';
             document.getElementById('config-modal').classList.remove('hidden');
         };
+
         window.closeConfigModal = () => document.getElementById('config-modal').classList.add('hidden');
+
         window.saveConfig = () => {
             localStorage.setItem('gh_repo', document.getElementById('git-repo').value.trim());
             localStorage.setItem('gh_token', document.getElementById('git-token').value.trim());
             closeConfigModal();
+            syncFromGitHub();
         };
+
         window.openUploadModal = (n) => {
             currentWeekToUpload = n;
             document.getElementById('modal-week-text').innerText = `Semana ${n}`;
+            document.getElementById('file-input').value = '';
             document.getElementById('file-name-display').innerText = "Seleccionar Archivo";
-            document.getElementById('file-name-display').classList.remove('text-violet-600');
             document.getElementById('upload-status').classList.add('hidden');
             document.getElementById('upload-modal').classList.remove('hidden');
         };
+
         window.closeUploadModal = () => document.getElementById('upload-modal').classList.add('hidden');
-        window.changeUnit = (n) => { selectedUnit = n; renderTabs(); renderContent(); };
+
+        window.changeUnit = (n) => { 
+            selectedUnit = n; 
+            renderTabs(); 
+            renderContent(); 
+        };
+
         window.toggleComplete = (n) => {
-            units = units.map(u => ({ ...u, weeks: u.weeks.map(w => w.number === n ? { ...w, completed: !w.completed } : w) }));
-            persistData(); renderContent(); updateProgress();
+            units.forEach(u => u.weeks.forEach(w => { 
+                if(w.number === n) {
+                    w.completed = !w.completed;
+                    // Guardar en localStorage para persistencia manual temporal
+                    const currentManual = JSON.parse(localStorage.getItem('db2_manual_completion')) || {};
+                    currentManual[n] = w.completed;
+                    localStorage.setItem('db2_manual_completion', JSON.stringify(currentManual));
+                }
+            }));
+            renderContent(); 
+            updateProgress();
         };
 
         function renderTabs() {
             const container = document.getElementById('unit-tabs');
-            if(!container) return;
-            container.innerHTML = units.map(u => `
-                <button onclick="changeUnit(${u.number})" class="px-8 py-4 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase ${selectedUnit === u.number ? 'bg-violet-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-800'}">
-                    Unidad 0${u.number}
-                </button>
-            `).join('');
+            container.innerHTML = units.map(u => `<button onclick="changeUnit(${u.number})" class="px-8 py-4 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase ${selectedUnit === u.number ? 'bg-violet-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-800'}">Unidad 0${u.number}</button>`).join('');
         }
 
         function renderContent() {
             const container = document.getElementById('main-content');
-            if(!container) return;
             const currentUnit = units.find(u => u.number === selectedUnit);
-            container.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 animate-fade-in">
-                    ${currentUnit.weeks.map(w => `
-                        <div class="group p-8 bg-white border border-slate-200 rounded-[2.5rem] hover:shadow-2xl flex flex-col min-h-[400px]">
-                            <div class="flex justify-between items-start mb-6">
-                                <div><span class="text-[10px] font-black text-slate-400 uppercase">Semana</span><h3 class="text-6xl font-black text-slate-900">${w.number < 10 ? '0'+w.number : w.number}</h3></div>
-                                <button onclick="openUploadModal(${w.number})" class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 hover:text-violet-600 flex items-center justify-center shadow-sm border border-slate-100"><i data-lucide="plus"></i></button>
-                            </div>
-                            <div class="flex-1 space-y-3 overflow-y-auto no-scrollbar max-h-[180px] mb-6">
-                                ${(w.activities || []).map(a => `<a href="${a.url}" target="_blank" class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl hover:translate-x-1 transition-all"><i data-lucide="file-text" class="w-3.5 h-3.5 text-violet-500"></i><span class="text-[9px] font-black text-slate-600 uppercase truncate">${a.name}</span></a>`).join('') || '<p class="text-[9px] text-slate-300 text-center py-6 uppercase font-black">Sin entregas</p>'}
-                            </div>
-                            <button onclick="toggleComplete(${w.number})" class="w-full py-3.5 ${w.completed ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-900 text-white'} rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2">
-                                <i data-lucide="${w.completed ? 'check-circle' : 'circle'}"></i> ${w.completed ? 'Completado' : 'Marcar'}
-                            </button>
+            
+            container.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 animate-fade-in">${currentUnit.weeks.map(w => `
+                <div class="p-8 bg-white border border-slate-200 rounded-[2.5rem] hover:shadow-2xl flex flex-col min-h-[400px]">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <span class="text-[10px] font-black text-slate-400 uppercase">Semana</span>
+                            <h3 class="text-6xl font-black text-slate-900 transition-colors group-hover:text-violet-600">${w.number < 10 ? '0'+w.number : w.number}</h3>
                         </div>
-                    `).join('')}
-                </div>
-            `;
-            if (window.lucide) lucide.createIcons();
+                        <button onclick="openUploadModal(${w.number})" class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 hover:text-violet-600 flex items-center justify-center shadow-sm border border-slate-100"><i data-lucide="plus"></i></button>
+                    </div>
+                    
+                    <div class="flex-1 space-y-3 overflow-y-auto no-scrollbar max-h-[180px] mb-6">
+                        ${w.isLoading ? 
+                            '<p class="text-[9px] text-violet-400 text-center py-6 uppercase font-black animate-pulse">Sincronizando...</p>' :
+                            (w.activities.length > 0 ? 
+                                w.activities.map(a => `<a href="${a.url}" target="_blank" class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl hover:translate-x-1 transition-all"><i data-lucide="file-text" class="w-3.5 h-3.5 text-violet-500"></i><span class="text-[9px] font-black text-slate-600 uppercase truncate">${a.name}</span></a>`).join('') :
+                                '<p class="text-[9px] text-slate-300 text-center py-6 uppercase font-black">Sin entregas</p>'
+                            )
+                        }
+                    </div>
+                    
+                    <button onclick="toggleComplete(${w.number})" class="w-full py-3.5 ${w.completed ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-900 text-white'} rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="${w.completed ? 'check-circle' : 'circle'}"></i> ${w.completed ? 'Completado' : 'Marcar'}
+                    </button>
+                </div>`).join('')}</div>`;
+            lucide.createIcons();
         }
 
         function updateProgress() {
-            const completedCount = units.reduce((acc, unit) => acc + unit.weeks.filter(w => w.completed).length, 0);
-            const percentage = Math.round((completedCount / 16) * 100);
+            const completed = units.reduce((acc, unit) => acc + unit.weeks.filter(w => w.completed).length, 0);
+            const percentage = Math.round((completed / 16) * 100);
             document.getElementById('progress-text').innerText = percentage + '%';
             document.getElementById('progress-bar').style.width = percentage + '%';
         }
 
-        initApp();
+        window.onload = () => { renderTabs(); renderContent(); syncFromGitHub(); };
     </script>
 </body>
 </html>
