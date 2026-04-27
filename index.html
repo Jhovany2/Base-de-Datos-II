@@ -8,163 +8,268 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        :root {
+            --primary: #8b5cf6;
+            --primary-light: #c4b5fd;
+            --bg: #0f172a; /* Fondo Slate 900 */
+            --card-bg: rgba(30, 41, 59, 0.7);
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg);
+            color: #f1f5f9;
+        }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .glass-card { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); }
-        .gradient-text { background: linear-gradient(to right, #7c3aed, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .modal-backdrop { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
-        .gear-spin:hover { transform: rotate(90deg); }
-        .login-bg { background: radial-gradient(circle at top left, #f5f3ff, #ffffff); }
+        
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Animación de rotación para el logo */
+        .logo-rotate {
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+        }
+        
+        .logo-rotate:hover {
+            transform: rotate(360deg) scale(1.1);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-6px) scale(1.02);
+            background: rgba(30, 41, 59, 0.9);
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #818cf8 0%, #a78bfa 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 1.5rem;
+            background: white;
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .modal-backdrop {
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-active-scale:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 transition-colors duration-300 overflow-x-hidden">
+<body class="overflow-x-hidden">
 
-    <!-- PANTALLA DE LOGIN -->
-    <div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center login-bg px-6">
-        <div class="absolute inset-0 pointer-events-none overflow-hidden">
-            <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-violet-500/10 blur-[120px] rounded-full"></div>
-            <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/10 blur-[120px] rounded-full"></div>
-        </div>
-
-        <div class="w-full max-w-md glass-card rounded-[3rem] p-10 shadow-2xl border border-white/50 relative z-10 animate-fade-in">
-            <div class="text-center mb-10">
-                <div class="w-20 h-20 bg-violet-600 rounded-3xl mx-auto mb-6 flex items-center justify-center shadow-xl shadow-violet-200">
-                    <i data-lucide="shield-check" class="w-10 h-10 text-white"></i>
-                </div>
-                <h2 class="text-3xl font-black text-slate-900 tracking-tighter">Bienvenido</h2>
-                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2">Portafolio Base de Datos II</p>
-            </div>
-
-            <div class="space-y-4">
-                <div>
-                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2 ml-1">Usuario</label>
-                    <input type="text" id="login-user" autocomplete="off" placeholder="admin o alumno" class="w-full px-5 py-4 bg-white/50 border border-slate-200 rounded-2xl focus:border-violet-500 outline-none transition-all font-medium text-sm">
-                </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2 ml-1">Contraseña</label>
-                    <input type="password" id="login-pass" autocomplete="new-password" placeholder="••••••••" class="w-full px-5 py-4 bg-white/50 border border-slate-200 rounded-2xl focus:border-violet-500 outline-none transition-all font-medium text-sm">
-                </div>
-                <button onclick="handleLogin()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-violet-600 transition-all shadow-xl mt-4">
-                    Entrar al Sistema
-                </button>
-            </div>
-            
-            <div class="mt-8 pt-6 border-t border-slate-100 text-center">
-                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed">
-                    Universidad Peruana Los Andes 
-                </p>
-            </div>
-        </div>
+    <!-- Decoración de Fondo -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-violet-900/20 blur-[120px] rounded-full animate-pulse"></div>
+        <div class="absolute bottom-[10%] right-[-5%] w-[500px] h-[500px] bg-indigo-900/20 blur-[120px] rounded-full"></div>
     </div>
 
-    <!-- CONTENIDO DEL PORTAFOLIO -->
-    <div id="portfolio-content" class="hidden opacity-0 transition-opacity duration-500">
-        <div class="fixed inset-0 pointer-events-none overflow-hidden">
-            <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-violet-500/10 blur-[120px] rounded-full"></div>
-            <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/10 blur-[120px] rounded-full"></div>
-        </div>
-
-        <header class="relative z-10 px-6 pt-16 pb-12 max-w-6xl mx-auto space-y-12">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-                <div class="flex items-center gap-4 group">
-                    <div class="w-14 h-14 bg-white/40 border border-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md shadow-xl overflow-hidden">
-                        <img id="univ-logo" src="img/logo.png" alt="Logo" class="w-full h-full object-contain p-1" onerror="this.src='https://placehold.co/100x100/7c3aed/ffffff?text=U'">
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Facultad de Ingeniería</p>
-                        <p class="text-[11px] font-bold text-slate-700">Sistemas y Computación</p>
-                    </div>
+    <!-- Navegación Superior -->
+    <nav class="sticky top-0 z-[50] glass-panel px-6 py-4 mb-8">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <!-- Logo Universidad con efecto de rotación -->
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg logo-rotate overflow-hidden">
+                    <img id="univ-logo-nav" src="img/logo.png" alt="UPLA Logo" class="w-full h-full object-contain p-1.5" onerror="this.src='https://placehold.co/100x100/7c3aed/ffffff?text=UPLA'">
                 </div>
+                <div class="hidden sm:block">
+                    <h2 class="text-sm font-black uppercase tracking-tighter text-slate-100">U. Los Andes</h2>
+                    <p class="text-[9px] text-slate-500 font-bold uppercase">Ingeniería de Sistemas</p>
+                </div>
+            </div>
 
-                <div class="flex items-center gap-4 self-end md:self-center">
-                    <button id="admin-gear" onclick="openConfigModal()" class="hidden w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center hover:bg-violet-50 transition-all shadow-md gear-spin">
-                        <i data-lucide="settings" class="w-6 h-6 text-slate-400"></i>
+            <!-- Tabs de Unidades -->
+            <div id="unit-tabs-container" class="flex gap-1 bg-slate-800/50 p-1 rounded-2xl hidden md:flex"></div>
+
+            <div class="flex items-center gap-3">
+                <button id="btn-show-login" onclick="openLoginModal()" class="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-900 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-violet-400 hover:text-white transition-all shadow-md btn-active-scale">
+                    <i data-lucide="lock" class="w-3 h-3"></i> Acceso Admin
+                </button>
+
+                <div id="admin-controls" class="hidden flex items-center gap-2">
+                    <button onclick="openConfigModal()" title="Configuración de GitHub" class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center hover:bg-slate-700 transition-all shadow-sm group">
+                        <i data-lucide="settings" class="w-5 h-5 text-slate-300 group-hover:rotate-90 transition-transform duration-500"></i>
                     </button>
-                    
-                    <button onclick="handleLogout()" title="Cerrar Sesión" class="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center hover:bg-rose-50 hover:text-rose-600 transition-all shadow-md">
+                    <button onclick="handleLogout()" title="Cerrar Sesión Admin" class="w-10 h-10 rounded-xl bg-rose-900/30 text-rose-400 border border-rose-900/50 flex items-center justify-center hover:bg-rose-900/50 transition-all shadow-sm">
                         <i data-lucide="log-out" class="w-5 h-5"></i>
                     </button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-                    <div class="h-10 w-[1px] bg-slate-200 mx-2"></div>
-                    <div class="text-right">
-                        <p id="user-role-label" class="text-[10px] font-black uppercase tracking-[0.2em] text-violet-500">Invitado</p>
-                        <p class="text-[11px] font-bold text-slate-700">Atequipa Porta Jhovany</p>
-                    </div>
-                    <div class="w-14 h-14 bg-white/40 border border-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md shadow-xl overflow-hidden">
-                        <img id="student-photo" src="img/perfil.jpg" alt="Foto" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x600/6366f1/ffffff?text=JP'">
+    <main class="relative z-10 max-w-7xl mx-auto px-6 pb-20">
+        <!-- Header -->
+        <header class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+            <div class="lg:col-span-2 space-y-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-900/30 text-emerald-400 border border-emerald-800/50 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
+                    <span id="sync-status-label">Portafolio Activo</span>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none">
+                    Base de <span class="gradient-text italic">Datos II.</span>
+                </h1>
+                <div class="flex items-center gap-4 pt-2">
+                    <img src="img/perfil.jpg" class="w-12 h-12 rounded-2xl border-2 border-slate-700 shadow-md object-cover" onerror="this.src='https://placehold.co/100x100/7c3aed/ffffff?text=JP'">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <p class="text-sm font-bold text-slate-100">Atequipa Porta Jhovany</p>
+                            <span id="user-role-label" class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-emerald-900/30 text-emerald-400">Estudiante</span>
+                        </div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Atequipa Porta Jhovany</p>
                     </div>
                 </div>
             </div>
 
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-10">
-                <div class="space-y-4">
-                    <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/50 border border-white/20 rounded-full backdrop-blur-md">
-                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-violet-500"></i>
-                        <span id="sync-status-label" class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Sincronización Automática</span>
+            <div class="glass-panel rounded-[2.5rem] p-8 flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[10px] font-black uppercase text-slate-500 mb-1">Progreso Semestral</p>
+                        <h3 id="progress-text" class="text-4xl font-black text-white">0%</h3>
                     </div>
-                    <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-slate-900 leading-[0.9]">
-                        Base de <br> <span class="gradient-text">Datos II.</span>
-                    </h1>
+                    <div class="w-12 h-12 bg-violet-900/30 rounded-2xl flex items-center justify-center border border-violet-800/30">
+                        <i data-lucide="bar-chart-3" class="w-6 h-6 text-violet-400"></i>
+                    </div>
                 </div>
-
-                <div class="relative p-8 glass-card rounded-[2.5rem] shadow-2xl min-w-[280px]">
-                    <div class="flex justify-between items-end mb-4">
-                        <div>
-                            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Semestre Completado</p>
-                            <h3 id="progress-text" class="text-4xl font-black text-slate-900">0%</h3>
-                        </div>
-                        <i data-lucide="database" class="w-8 h-8 text-violet-500/50"></i>
-                    </div>
-                    <div class="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
-                        <div id="progress-bar" class="h-full bg-gradient-to-r from-violet-600 to-indigo-500 transition-all duration-1000 ease-out" style="width: 0%"></div>
+                <div class="mt-6">
+                    <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                        <div id="progress-bar" class="h-full bg-gradient-to-r from-violet-600 to-pink-500 transition-all duration-1000 ease-out" style="width: 0%"></div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <nav class="relative z-20 sticky top-0 bg-slate-50/80 backdrop-blur-md border-y border-slate-200 px-6">
-            <div id="unit-tabs" class="max-w-6xl mx-auto flex gap-2 overflow-x-auto py-2 no-scrollbar"></div>
-        </nav>
+        <!-- Móvil Unit Tabs -->
+        <div class="md:hidden flex overflow-x-auto gap-2 pb-4 no-scrollbar mb-6">
+            <div id="unit-tabs-mobile" class="flex gap-2"></div>
+        </div>
 
-        <main id="main-content" class="relative z-10 max-w-6xl mx-auto px-6 py-16 min-h-[400px]"></main>
-    </div>
+        <div class="flex items-center gap-4 mb-8">
+            <h2 id="current-unit-title" class="text-xl font-black text-slate-300 tracking-tight uppercase">Cargando...</h2>
+            <div class="h-[1px] flex-1 bg-slate-800"></div>
+        </div>
 
-    <!-- Modales -->
-    <div id="config-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center px-4 modal-backdrop">
-        <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 scale-in">
-            <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-4">Configuración de API</h3>
-            <div class="space-y-6">
-                <div>
-                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2 ml-1">Repositorio (Usuario/Repo)</label>
-                    <input type="text" id="git-repo" autocomplete="off" placeholder="Ej: Jhovany2/Base-de-Datos-II" class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:border-violet-500 outline-none text-sm font-medium">
+        <div id="main-content" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 min-h-[400px]"></div>
+    </main>
+
+    <!-- VISOR -->
+    <div id="preview-modal" class="fixed inset-0 z-[200] hidden flex items-center justify-center modal-backdrop p-4 md:p-10">
+        <div class="w-full h-full max-w-6xl bg-slate-900 rounded-[3rem] shadow-2xl relative flex flex-col animate-fade-in overflow-hidden border border-slate-800">
+            <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900 z-10">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-violet-900/30 rounded-2xl flex items-center justify-center border border-violet-800/30"><i data-lucide="file-text" class="w-6 h-6 text-violet-400"></i></div>
+                    <div>
+                        <h3 id="preview-title" class="text-sm font-black text-slate-100 uppercase truncate max-w-[200px]">Archivo</h3>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Vista Previa</p>
+                    </div>
                 </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2 ml-1">Personal Token (PAT)</label>
-                    <input type="password" id="git-token" autocomplete="new-password" placeholder="ghp_xxxxxxxxxxxx" class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:border-violet-500 outline-none text-sm font-medium">
+                <div class="flex items-center gap-2">
+                    <a id="btn-download-preview" href="#" target="_blank" class="p-4 bg-slate-800 text-slate-300 rounded-2xl hover:bg-violet-600 hover:text-white transition-all shadow-sm"><i data-lucide="external-link" class="w-5 h-5"></i></a>
+                    <button onclick="closePreviewModal()" class="p-4 bg-rose-900/30 text-rose-400 rounded-2xl hover:bg-rose-900/60 transition-all shadow-sm"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
-                <button onclick="saveConfig()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-violet-600 transition-all shadow-xl">Activar Conexión</button>
+            </div>
+            <div id="preview-body" class="flex-1 bg-slate-950 overflow-hidden flex items-center justify-center relative">
+                <div id="preview-content-area" class="w-full h-full relative z-10"></div>
             </div>
         </div>
     </div>
 
-    <div id="upload-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center px-4 modal-backdrop">
-        <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 scale-in">
-            <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2">Subir Actividad</h3>
-            <p id="modal-week-text" class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-8"></p>
+    <!-- LOGIN -->
+    <div id="login-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center modal-backdrop px-6">
+        <div class="w-full max-w-sm bg-slate-900 rounded-[3rem] p-10 shadow-2xl relative animate-fade-in border border-slate-800">
+            <button onclick="closeLoginModal()" class="absolute top-8 right-8 text-slate-500 hover:text-slate-300 transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-violet-600 rounded-[2rem] mx-auto mb-6 flex items-center justify-center shadow-xl shadow-violet-900/50 animate-float"><i data-lucide="fingerprint" class="w-10 h-10 text-white"></i></div>
+                <h2 class="text-3xl font-black text-white tracking-tighter leading-none text-center uppercase">Gestión</h2>
+            </div>
+            <div class="space-y-4">
+                <input type="text" id="adm-u-fld" placeholder="Usuario" autocomplete="off" class="w-full px-6 py-4 bg-slate-800 border border-slate-700 text-white rounded-2xl focus:border-violet-500 outline-none text-sm font-bold transition-all">
+                <input type="password" id="adm-p-fld" placeholder="Contraseña" autocomplete="new-password" class="w-full px-6 py-4 bg-slate-800 border border-slate-700 text-white rounded-2xl focus:border-violet-500 outline-none text-sm font-bold transition-all">
+                
+                <p id="login-error-msg" class="text-[10px] text-rose-500 font-bold uppercase text-center hidden">Acceso denegado</p>
+                
+                <button id="btn-do-login" onclick="handleLogin()" class="w-full py-4 bg-violet-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-violet-700 transition-all shadow-xl btn-active-scale">Entrar</button>
+            </div>
+            <div class="mt-8 pt-6 border-t border-slate-800 text-center text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">Universidad Peruana Los Andes</div>
+        </div>
+    </div>
+
+    <!-- CONFIG API -->
+    <div id="config-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center modal-backdrop px-6">
+        <div class="w-full max-w-md bg-slate-900 rounded-[3rem] p-10 shadow-2xl scale-in border border-slate-800">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-black text-white tracking-tighter uppercase">GitHub API</h3>
+                <button onclick="closeConfigModal()" class="text-slate-500 hover:text-slate-300"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
             <div class="space-y-6">
-                <div class="p-8 border-2 border-dashed border-slate-200 rounded-[2rem] text-center hover:border-violet-400 transition-all cursor-pointer bg-slate-50">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-500 mb-2 block">Repositorio</label>
+                    <input type="text" id="git-repo" placeholder="Usuario/Repo" class="w-full px-6 py-4 bg-slate-800 border border-slate-700 text-white rounded-2xl font-bold text-sm outline-none">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-500 mb-2 block">Token (PAT)</label>
+                    <input type="password" id="git-token" placeholder="ghp_..." class="w-full px-6 py-4 bg-slate-800 border border-slate-700 text-white rounded-2xl font-bold text-sm outline-none">
+                </div>
+                <button onclick="saveConfig()" class="w-full py-4 bg-slate-100 text-slate-900 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-violet-500 hover:text-white transition-all">Sincronizar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPLOAD -->
+    <div id="upload-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center modal-backdrop px-6">
+        <div class="w-full max-w-md bg-slate-900 rounded-[3rem] p-10 shadow-2xl relative border border-slate-800">
+            <h3 class="text-2xl font-black text-white tracking-tighter mb-2 uppercase">Subir</h3>
+            <p id="modal-week-text" class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mb-8">Semana 01</p>
+            <div class="space-y-6">
+                <div class="p-12 border-4 border-dashed border-slate-800 rounded-[2.5rem] text-center hover:border-violet-800 transition-all cursor-pointer bg-slate-950 group">
                     <input type="file" id="file-input" class="hidden" onchange="updateFileName(this)">
-                    <label for="file-input" class="cursor-pointer block">
-                        <i data-lucide="file-up" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
-                        <p id="file-name-display" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Seleccionar Archivo</p>
-                    </label>
+                    <label for="file-input" class="cursor-pointer block"><i data-lucide="cloud-upload" class="w-16 h-16 text-slate-700 mx-auto mb-4 group-hover:text-violet-500 transition-all"></i><p id="file-name-display" class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Seleccionar Archivo</p></label>
                 </div>
                 <div id="upload-status" class="hidden text-center py-2"><p id="upload-status-text" class="text-[10px] font-black uppercase tracking-widest"></p></div>
                 <div class="flex gap-3">
-                    <button onclick="closeUploadModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-2xl font-bold text-xs uppercase tracking-widest">Cancelar</button>
-                    <button id="btn-upload" onclick="handleFileUpload()" class="flex-1 py-4 bg-violet-600 text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-lg">Subir</button>
+                    <button onclick="closeUploadModal()" class="flex-1 py-4 bg-slate-800 text-slate-400 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-700 transition-all">Cerrar</button>
+                    <button id="btn-upload" onclick="handleFileUpload()" class="flex-1 py-4 bg-violet-600 text-white rounded-2xl font-black text-xs uppercase shadow-lg shadow-violet-900/50">Subir Ahora</button>
                 </div>
             </div>
         </div>
@@ -173,43 +278,22 @@
     <script>
         const DEFAULT_CONFIG = {
             repo: 'Jhovany2/Base-de-Datos-II',
-            token: 'ghp_bvfBXRt3x8zpc1L' + 'Fg4n42Ul3KFRn5x0paXos' 
+            token: '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' 
         };
 
-        const CREDENTIALS = {
-            admin: { user: 'admin', pass: 'admin123', role: 'ADMIN' },
-            student: { user: 'alumno', pass: 'alumno123', role: 'STUDENT' }
-        };
+        const ADMIN_CREDENTIALS = { user: 'admin', pass: 'admin123' };
+        let currentUser = JSON.parse(localStorage.getItem('db2_session')) || { role: 'STUDENT' };
 
-        let currentUser = JSON.parse(localStorage.getItem('db2_session')) || null;
-
-        // --- UNIDADES ACTUALIZADAS SEGÚN IMAGEN ---
         let units = [
-            { 
-                number: 1, 
-                title: "Introducción a la arquitectura de Base de Datos", 
-                weeks: [
-                    { number: 1, name: "Introducción a la arquitectura de B.D.", completed: false, activities: [], isLoading: true },
-                    { number: 2, name: "Gestores de B.D.", completed: false, activities: [], isLoading: true },
-                    { number: 3, name: "Arquitectura de B.D.", completed: false, activities: [], isLoading: true },
-                    { number: 4, name: "Diseño de la arquitectura de B.D.", completed: false, activities: [], isLoading: true }
-                ] 
-            },
-            { 
-                number: 2, 
-                title: "Programación en Servidor", 
-                weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 5, name: `Tema por Definir ${i+5}`, completed: false, activities: [], isLoading: true })) 
-            },
-            { 
-                number: 3, 
-                title: "Bases de Datos NoSQL", 
-                weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 9, name: `Tema por Definir ${i+9}`, completed: false, activities: [], isLoading: true })) 
-            },
-            { 
-                number: 4, 
-                title: "Administración y Seguridad", 
-                weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 13, name: `Tema por Definir ${i+13}`, completed: false, activities: [], isLoading: true })) 
-            }
+            { number: 1, title: "Introducción a la arquitectura de Base de Datos", weeks: [
+                { number: 1, name: "Introducción a la arquitectura de B.D.", completed: false, activities: [], isLoading: true },
+                { number: 2, name: "Gestores de B.D.", completed: false, activities: [], isLoading: true },
+                { number: 3, name: "Arquitectura de B.D.", completed: false, activities: [], isLoading: true },
+                { number: 4, name: "Diseño de la arquitectura de B.D.", completed: false, activities: [], isLoading: true }
+            ]},
+            { number: 2, title: "Programación en Servidor SQL", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 5, name: `Tema Clase ${i+5}`, completed: false, activities: [], isLoading: true })) },
+            { number: 3, title: "Bases de Datos NoSQL y Big Data", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 9, name: `Laboratorio ${i+9}`, completed: false, activities: [], isLoading: true })) },
+            { number: 4, title: "Administración, Seguridad y Backup", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 13, name: `Final ${i+13}`, completed: false, activities: [], isLoading: true })) }
         ];
 
         let selectedUnit = 1;
@@ -218,202 +302,163 @@
         function getActiveConfig() {
             const sRepo = localStorage.getItem('gh_repo');
             const sToken = localStorage.getItem('gh_token');
-            return {
-                repo: (sRepo && sRepo.trim() !== '') ? sRepo : DEFAULT_CONFIG.repo,
-                token: (sToken && sToken.trim() !== '') ? sToken : DEFAULT_CONFIG.token
-            };
+            return { repo: (sRepo && sRepo.trim() !== '') ? sRepo : DEFAULT_CONFIG.repo, token: (sToken && sToken.trim() !== '') ? sToken : DEFAULT_CONFIG.token };
         }
 
-        async function handleLogin() {
-            const userInput = document.getElementById('login-user').value.toLowerCase();
-            const passInput = document.getElementById('login-pass').value;
-            let roleFound = null;
-            if (userInput === CREDENTIALS.admin.user && passInput === CREDENTIALS.admin.pass) roleFound = CREDENTIALS.admin.role;
-            if (userInput === CREDENTIALS.student.user && passInput === CREDENTIALS.student.pass) roleFound = CREDENTIALS.student.role;
+        window.openLoginModal = () => {
+            document.getElementById('login-modal').classList.remove('hidden');
+            document.getElementById('adm-u-fld').value = '';
+            document.getElementById('adm-p-fld').value = '';
+            setTimeout(() => document.getElementById('adm-u-fld').focus(), 100);
+        };
+        window.closeLoginModal = () => document.getElementById('login-modal').classList.add('hidden');
 
-            if (roleFound) {
-                currentUser = { user: userInput, role: roleFound };
+        function handleLogin() {
+            const uInput = document.getElementById('adm-u-fld').value.trim().toLowerCase();
+            const pInput = document.getElementById('adm-p-fld').value;
+            const errorLabel = document.getElementById('login-error-msg');
+
+            if (uInput === ADMIN_CREDENTIALS.user && pInput === ADMIN_CREDENTIALS.pass) {
+                currentUser = { role: 'ADMIN' };
                 localStorage.setItem('db2_session', JSON.stringify(currentUser));
-                initAppView();
-            } else { alert("Credenciales incorrectas."); }
+                closeLoginModal();
+                updateUserUI();
+                syncFromGitHub();
+            } else {
+                errorLabel.classList.remove('hidden');
+                setTimeout(() => errorLabel.classList.add('hidden'), 2000);
+            }
         }
 
-        function handleLogout() { localStorage.removeItem('db2_session'); location.reload(); }
+        function handleLogout() { 
+            localStorage.setItem('db2_session', JSON.stringify({ role: 'STUDENT' })); 
+            location.reload(); 
+        }
 
-        function initAppView() {
-            if (!currentUser) return;
-            document.getElementById('login-screen').classList.add('hidden');
-            const app = document.getElementById('portfolio-content');
-            app.classList.remove('hidden');
-            setTimeout(() => app.classList.add('opacity-100'), 50);
-
+        function updateUserUI() {
             const isAdm = currentUser.role === 'ADMIN';
-            document.getElementById('admin-gear').classList.toggle('hidden', !isAdm);
-            document.getElementById('user-role-label').innerText = isAdm ? 'Administrador' : 'Alumno';
-            document.getElementById('user-role-label').className = `text-[10px] font-black uppercase tracking-[0.2em] ${isAdm ? 'text-violet-500' : 'text-emerald-500'}`;
+            const adminCtrls = document.getElementById('admin-controls');
+            const loginBtn = document.getElementById('btn-show-login');
+            const roleLabel = document.getElementById('user-role-label');
 
-            renderTabs();
+            if(adminCtrls) adminCtrls.classList.toggle('hidden', !isAdm);
+            if(loginBtn) loginBtn.classList.toggle('hidden', isAdm);
+            if(roleLabel) {
+                roleLabel.innerText = isAdm ? 'Administrador' : 'Estudiante';
+                roleLabel.className = `px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${isAdm ? 'bg-violet-900/30 text-violet-400' : 'bg-emerald-900/30 text-emerald-400'}`;
+            }
             renderContent();
-            syncFromGitHub();
         }
+
+        window.openFilePreview = (url, name) => {
+            const container = document.getElementById('preview-content-area');
+            const modal = document.getElementById('preview-modal');
+            const title = document.getElementById('preview-title');
+            title.innerText = name;
+            document.getElementById('btn-download-preview').href = url;
+            const rawUrl = url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+            const ext = name.split('.').pop().toLowerCase();
+            let content = '';
+            if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext)) content = `<img src="${rawUrl}" class="max-w-[90%] max-h-[90%] rounded-2xl shadow-2xl">`;
+            else if (ext === 'pdf') content = `<iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(rawUrl)}&embedded=true" class="preview-iframe"></iframe>`;
+            else content = `<div class="text-center p-12 glass-panel rounded-[3rem] max-w-sm"><i data-lucide="file-code" class="w-10 h-10 text-slate-600 mx-auto mb-4"></i><p class="text-slate-100 font-bold mb-6">No disponible para .${ext}</p><a href="${url}" target="_blank" class="px-8 py-3 bg-violet-600 text-white rounded-xl text-xs font-black uppercase shadow-lg">Ver GitHub</a></div>`;
+            container.innerHTML = content;
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        };
+        window.closePreviewModal = () => { document.getElementById('preview-modal').classList.add('hidden'); document.getElementById('preview-content-area').innerHTML = ''; };
 
         async function syncFromGitHub() {
             const config = getActiveConfig();
-            if (!config.repo || !config.token) {
-                units.forEach(u => u.weeks.forEach(w => w.isLoading = false));
-                renderContent();
-                return;
-            }
-
-            document.getElementById('sync-status-label').innerText = "Sincronizando Archivos...";
-            units.forEach(u => u.weeks.forEach(w => { w.activities = []; w.isLoading = true; }));
-            renderContent();
-
+            if (!config.repo || !config.token) return;
             const cleanRepo = config.repo.replace('https://github.com/', '').trim();
-
             for (let unit of units) {
                 for (let week of unit.weeks) {
-                    const path = `Semana ${week.number}`;
-                    const url = `https://api.github.com/repos/${cleanRepo}/contents/${encodeURIComponent(path)}`;
+                    const url = `https://api.github.com/repos/${cleanRepo}/contents/Semana%20${week.number}`;
                     try {
-                        const res = await fetch(url, { headers: { 'Authorization': `token ${config.token}` }, cache: 'no-store' });
+                        const res = await fetch(url, { headers: { 'Authorization': `token ${config.token}` } });
                         if (res.ok) {
                             const files = await res.json();
                             if (Array.isArray(files)) {
                                 week.activities = files.map(f => ({ name: f.name, url: f.html_url }));
-                                week.completed = week.activities.some(file => file.name.toLowerCase() !== 'readme.md');
+                                week.completed = week.activities.some(f => f.name.toLowerCase() !== 'readme.md');
                             }
                         }
-                    } catch (e) { console.error(e); } 
-                    finally { week.isLoading = false; }
+                    } catch (e) {} finally { week.isLoading = false; }
                 }
                 if (selectedUnit === unit.number) renderContent();
             }
-            document.getElementById('sync-status-label').innerText = "Sincronización Automática Activada";
             updateProgress();
         }
 
         window.handleFileUpload = async () => {
-            if (currentUser?.role !== 'ADMIN') return;
+            if (currentUser.role !== 'ADMIN') return;
             const fileInput = document.getElementById('file-input');
             const statusText = document.getElementById('upload-status-text');
             const config = getActiveConfig();
-            const cleanRepo = config.repo.replace('https://github.com/', '').trim();
-            if (!fileInput.files[0] || !cleanRepo || !config.token) return;
-
+            if (!fileInput.files[0]) return;
             document.getElementById('upload-status').classList.remove('hidden');
             statusText.innerText = "Subiendo...";
-            document.getElementById('btn-upload').disabled = true;
-            
             const file = fileInput.files[0];
             const reader = new FileReader();
             reader.onload = async () => {
                 const base64 = reader.result.split(',')[1];
-                const path = `Semana ${currentWeekToUpload}/${file.name}`;
-                const url = `https://api.github.com/repos/${cleanRepo}/contents/${encodeURIComponent(path)}`;
+                const cleanRepo = config.repo.replace('https://github.com/', '').trim();
+                const url = `https://api.github.com/repos/${cleanRepo}/contents/Semana%20${currentWeekToUpload}/${file.name}`;
                 try {
                     const check = await fetch(url, { headers: { 'Authorization': `token ${config.token}` } });
                     const sha = check.ok ? (await check.json()).sha : null;
-                    const res = await fetch(url, {
-                        method: 'PUT',
-                        headers: { 'Authorization': `token ${config.token}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: `Upload ${file.name}`, content: base64, sha: sha })
-                    });
+                    const res = await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${config.token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ message: `Add: ${file.name}`, content: base64, sha: sha }) });
                     if (res.ok) { syncFromGitHub(); setTimeout(closeUploadModal, 1000); }
-                } catch (e) { alert("Error de red"); } finally { document.getElementById('btn-upload').disabled = false; }
+                } catch (e) { alert("Error"); }
             };
             reader.readAsDataURL(file);
         };
 
-        window.updateFileName = (input) => { document.getElementById('file-name-display').innerText = input.files[0]?.name || "Seleccionar Archivo"; };
-        window.openConfigModal = () => {
-            const config = getActiveConfig();
-            document.getElementById('git-repo').value = localStorage.getItem('gh_repo') || DEFAULT_CONFIG.repo;
-            document.getElementById('git-token').value = localStorage.getItem('gh_token') || DEFAULT_CONFIG.token;
-            document.getElementById('config-modal').classList.remove('hidden');
-        };
-        window.closeConfigModal = () => document.getElementById('config-modal').classList.add('hidden');
-        window.saveConfig = () => {
-            localStorage.setItem('gh_repo', document.getElementById('git-repo').value.trim());
-            localStorage.setItem('gh_token', document.getElementById('git-token').value.trim());
-            closeConfigModal(); syncFromGitHub();
-        };
-        window.openUploadModal = (n) => {
-            if (currentUser?.role !== 'ADMIN') return;
-            currentWeekToUpload = n;
-            document.getElementById('modal-week-text').innerText = `Semana ${n}`;
-            document.getElementById('upload-modal').classList.remove('hidden');
-        };
-        window.closeUploadModal = () => document.getElementById('upload-modal').classList.add('hidden');
-        window.changeUnit = (n) => { selectedUnit = n; renderTabs(); renderContent(); };
-
-        window.toggleComplete = (n) => {
-            if (currentUser?.role !== 'ADMIN') {
-                alert("El estado es automático según GitHub.");
-                return;
-            }
-            units.forEach(u => u.weeks.forEach(w => { if(w.number === n) w.completed = !w.completed; }));
-            renderContent(); updateProgress();
-        };
-
         function renderTabs() {
-            const container = document.getElementById('unit-tabs');
-            container.innerHTML = units.map(u => `<button onclick="changeUnit(${u.number})" class="px-8 py-4 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase ${selectedUnit === u.number ? 'bg-violet-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-800'}">Unidad 0${u.number}</button>`).join('');
+            const tabsHtml = units.map(u => `<button onclick="changeUnit(${u.number})" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedUnit === u.number ? 'bg-slate-700 text-violet-400 shadow-sm' : 'text-slate-500 hover:text-slate-300'}">Unidad ${u.number}</button>`).join('');
+            document.getElementById('unit-tabs-container').innerHTML = tabsHtml;
+            document.getElementById('unit-tabs-mobile').innerHTML = tabsHtml;
         }
 
         function renderContent() {
             const container = document.getElementById('main-content');
+            if(!container) return;
             const unit = units.find(u => u.number === selectedUnit);
-            const isAdm = currentUser?.role === 'ADMIN';
-
-            container.innerHTML = `
-                <div class="space-y-12 animate-fade-in">
-                    <div class="flex flex-col gap-2">
-                        <div class="flex items-center gap-4">
-                            <div class="h-[2px] w-12 bg-violet-600 rounded-full"></div>
-                            <h2 class="text-sm font-black uppercase tracking-[0.3em] text-slate-400">Plan de Estudios</h2>
-                        </div>
-                        <p class="text-2xl font-bold ml-16 text-slate-800">${unit.title}</p>
+            const isAdm = currentUser.role === 'ADMIN';
+            document.getElementById('current-unit-title').innerText = unit.title;
+            container.innerHTML = unit.weeks.map(w => `
+                <div class="glass-panel p-8 rounded-[2.5rem] card-hover flex flex-col min-h-[420px] group relative overflow-hidden animate-fade-in">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-violet-600/5 blur-3xl -mr-16 -mt-16 group-hover:bg-violet-600/10 transition-colors"></div>
+                    
+                    <div class="flex justify-between items-start mb-6">
+                        <div><span class="text-[10px] font-black text-slate-500 uppercase">Semana</span><h3 class="text-6xl font-black text-white group-hover:gradient-text transition-all">${w.number < 10 ? '0'+w.number : w.number}</h3></div>
+                        ${isAdm ? `<button onclick="openUploadModal(${w.number})" class="w-11 h-11 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-violet-400 flex items-center justify-center transition-all hover:scale-110 shadow-sm"><i data-lucide="plus"></i></button>` : ''}
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                        ${unit.weeks.map(w => `
-                            <div class="p-8 bg-white border border-slate-200 rounded-[2.5rem] hover:shadow-2xl flex flex-col min-h-[420px]">
-                                <div class="flex justify-between items-start mb-4">
-                                    <div>
-                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Semana</span>
-                                        <h3 class="text-6xl font-black text-slate-900">${w.number < 10 ? '0'+w.number : w.number}</h3>
-                                    </div>
-                                    ${isAdm ? `<button onclick="openUploadModal(${w.number})" class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 hover:text-violet-600 flex items-center justify-center shadow-sm border border-slate-100"><i data-lucide="plus"></i></button>` : ''}
-                                </div>
-                                
-                                <p class="text-[11px] font-bold text-slate-600 mb-6 uppercase tracking-tight leading-relaxed min-h-[32px]">${w.name}</p>
-
-                                <div class="flex-1 space-y-3 overflow-y-auto no-scrollbar max-h-[180px] mb-6">
-                                    ${w.isLoading ? '<p class="text-[9px] text-violet-400 text-center py-6 uppercase font-black animate-pulse">Sincronizando...</p>' :
-                                    (w.activities.length > 0 ? w.activities.map(a => `<a href="${a.url}" target="_blank" class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl hover:translate-x-1 transition-all"><i data-lucide="file-text" class="w-3.5 h-3.5 text-violet-500"></i><span class="text-[9px] font-black text-slate-600 uppercase truncate">${a.name}</span></a>`).join('') : '<p class="text-[9px] text-slate-300 text-center py-6 uppercase font-black">Sin entregas</p>')}
-                                </div>
-                                
-                                <button onclick="toggleComplete(${w.number})" class="w-full py-3.5 ${w.completed ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-900 text-white'} rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 ${isAdm ? '' : 'cursor-default'}">
-                                    <i data-lucide="${w.completed ? 'check-circle' : 'circle'}"></i> ${w.completed ? 'Completado' : 'Pendiente'}
-                                </button>
-                            </div>`).join('')}
+                    <p class="text-[11px] font-extrabold text-slate-300 mb-8 uppercase leading-snug min-h-[32px]">${w.name}</p>
+                    <div class="flex-1 space-y-3 overflow-y-auto no-scrollbar max-h-[160px] mb-8 pr-1">
+                        ${w.isLoading ? '<div class="space-y-2"><div class="h-10 shimmer rounded-xl"></div></div>' :
+                        (w.activities && w.activities.length > 0 ? w.activities.map(a => `
+                            <button onclick="openFilePreview('${a.url}', '${a.name}')" class="w-full flex items-center gap-3 p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl hover:bg-slate-800 transition-all text-left shadow-sm group/file truncate">
+                                <i data-lucide="file-text" class="w-4 h-4 text-violet-400"></i>
+                                <span class="text-[9px] font-bold text-slate-300 uppercase truncate">${a.name}</span>
+                            </button>`).join('') : '<div class="flex flex-col items-center justify-center py-6 text-slate-700 opacity-50"><p class="text-[8px] font-black uppercase">Vacío</p></div>')}
                     </div>
-                </div>`;
+                    <div class="w-full py-4 ${w.completed ? 'bg-emerald-900/20 text-emerald-400 border-emerald-900/50' : 'bg-slate-800/30 text-slate-500 border-slate-800/50'} rounded-[1.5rem] border text-[10px] font-black uppercase flex items-center justify-center gap-3 transition-all"><div class="w-2 h-2 rounded-full ${w.completed ? 'bg-emerald-500 animate-pulse' : 'bg-slate-700'}"></div>${w.completed ? 'Completado' : 'Pendiente'}</div>
+                </div>`).join('');
             lucide.createIcons();
         }
 
-        function updateProgress() {
-            const completed = units.reduce((acc, unit) => acc + unit.weeks.filter(w => w.completed).length, 0);
-            const percentage = Math.round((completed / 16) * 100);
-            document.getElementById('progress-text').innerText = percentage + '%';
-            document.getElementById('progress-bar').style.width = percentage + '%';
-        }
+        window.saveConfig = () => { localStorage.setItem('gh_repo', document.getElementById('git-repo').value.trim()); localStorage.setItem('gh_token', document.getElementById('git-token').value.trim()); closeConfigModal(); syncFromGitHub(); };
+        window.openConfigModal = () => { document.getElementById('git-repo').value = localStorage.getItem('gh_repo') || DEFAULT_CONFIG.repo; document.getElementById('git-token').value = localStorage.getItem('gh_token') || DEFAULT_CONFIG.token; document.getElementById('config-modal').classList.remove('hidden'); };
+        window.closeConfigModal = () => document.getElementById('config-modal').classList.add('hidden');
+        window.openUploadModal = (n) => { currentWeekToUpload = n; document.getElementById('modal-week-text').innerText = `Semana 0${n}`; document.getElementById('upload-modal').classList.remove('hidden'); };
+        window.closeUploadModal = () => document.getElementById('upload-modal').classList.add('hidden');
+        window.updateFileName = (i) => { document.getElementById('file-name-display').innerText = i.files[0]?.name || "Seleccionar Archivo"; };
+        window.changeUnit = (n) => { selectedUnit = n; renderTabs(); renderContent(); };
+        function updateProgress() { const c = units.reduce((acc, u) => acc + u.weeks.filter(w => w.completed).length, 0); const p = Math.round((c / 16) * 100); document.getElementById('progress-text').innerText = p + '%'; document.getElementById('progress-bar').style.width = p + '%'; }
 
-        window.onload = () => { 
-            document.getElementById('login-user').value = "";
-            document.getElementById('login-pass').value = "";
-            if (currentUser) initAppView(); else lucide.createIcons(); 
-        };
+        window.onload = () => { updateUserUI(); renderTabs(); syncFromGitHub(); };
     </script>
 </body>
 </html>
