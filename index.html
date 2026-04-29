@@ -12,126 +12,52 @@
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        
-        :root {
-            --primary: #8b5cf6;
-            --primary-light: #c4b5fd;
-            --bg: #0f172a; 
-            --card-bg: rgba(30, 41, 59, 0.7);
-        }
-
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--bg);
-            color: #f1f5f9;
-        }
-
+        :root { --primary: #8b5cf6; --bg: #0f172a; --card-bg: rgba(30, 41, 59, 0.7); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: #f1f5f9; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        .glass-panel { background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); }
         
-        .glass-panel {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
-
-        .logo-rotate {
-            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-            cursor: pointer;
-        }
+        .logo-rotate:hover { transform: rotate(360deg) scale(1.1); transition: 0.8s; }
+        .card-hover { transition: all 0.4s; }
+        .card-hover:hover { transform: translateY(-6px); background: rgba(30, 41, 59, 0.9); border-color: rgba(139, 92, 246, 0.4); }
+        .gradient-text { background: linear-gradient(135deg, #818cf8 0%, #a78bfa 50%, #f472b6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        .logo-rotate:hover {
-            transform: rotate(360deg) scale(1.1);
-            box-shadow: 0 0 25px rgba(139, 92, 246, 0.5);
-        }
-
-        .card-hover {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        /* Visor Interno Optimizado */
+        .preview-content { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #020617; border-radius: 1rem; overflow: hidden; }
+        .preview-iframe { width: 100%; height: 100%; border: none; background: white; }
+        .code-viewer { width: 100%; height: 100%; background: #020617; padding: 1.5rem; color: #94a3b8; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5; }
         
-        .card-hover:hover {
-            transform: translateY(-6px) scale(1.02);
-            background: rgba(30, 41, 59, 0.9);
-            border-color: rgba(139, 92, 246, 0.4);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #818cf8 0%, #a78bfa 50%, #f472b6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .preview-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: 1.5rem;
-            background: white;
-        }
-
-        .shimmer {
-            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        .modal-backdrop {
-            background: rgba(2, 6, 23, 0.85);
-            backdrop-filter: blur(12px);
-        }
-
-        .btn-active-scale:active {
-            transform: scale(0.95);
-        }
+        .modal-backdrop { background: rgba(2, 6, 23, 0.96); backdrop-filter: blur(20px); }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body class="overflow-x-hidden">
 
-    <!-- Fondo Decorativo -->
     <div class="fixed inset-0 pointer-events-none z-0">
-        <div class="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-violet-900/20 blur-[120px] rounded-full animate-pulse"></div>
-        <div class="absolute bottom-[10%] right-[-5%] w-[500px] h-[500px] bg-indigo-900/20 blur-[120px] rounded-full"></div>
+        <div class="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-violet-900/20 blur-[120px] rounded-full"></div>
     </div>
 
-    <!-- Navegación Superior -->
+    <!-- Navegación -->
     <nav class="sticky top-0 z-[50] glass-panel px-6 py-4 mb-8">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg logo-rotate overflow-hidden">
-                    <img id="univ-logo-nav" src="img/logo.png" alt="Logo UPLA" class="w-full h-full object-contain p-1.5" onerror="this.src='https://placehold.co/100x100/7c3aed/ffffff?text=UPLA'">
+                <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg logo-rotate overflow-hidden">
+                    <img src="img/logo.png" alt="Logo UPLA" class="w-full h-full object-contain p-1" onerror="this.src='https://placehold.co/100x100/7c3aed/ffffff?text=UPLA'">
                 </div>
-                <div class="hidden sm:block">
-                    <h2 class="text-sm font-black uppercase tracking-tighter text-slate-100">U. Los Andes</h2>
-                    <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Ingeniería de Sistemas</p>
+                <div>
+                    <h2 class="text-xs font-black uppercase tracking-tighter text-slate-100">Universidad Peruana Los Andes</h2>
+                    <p class="text-[8px] text-emerald-400 font-bold uppercase tracking-widest">Base de Datos II</p>
                 </div>
             </div>
 
             <div id="unit-tabs-container" class="flex gap-1 bg-slate-800/50 p-1 rounded-2xl hidden md:flex"></div>
 
             <div class="flex items-center gap-3">
-                <button id="btn-show-login" onclick="openLoginModal()" class="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-900 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-violet-400 hover:text-white transition-all shadow-md btn-active-scale">
-                    <i data-lucide="lock" class="w-3 h-3"></i> Acceso Admin
-                </button>
-
+                <button id="btn-show-login" onclick="openLoginModal()" class="px-3 py-1.5 bg-slate-100 text-slate-900 rounded-lg text-[9px] font-bold uppercase hover:bg-violet-400 transition-all">Panel de Admin</button>
                 <div id="admin-controls" class="hidden flex items-center gap-2">
-                    <button onclick="handleLogout()" title="Cerrar Sesión" class="w-10 h-10 rounded-xl bg-rose-900/30 text-rose-400 border border-rose-900/50 flex items-center justify-center hover:bg-rose-900/50 transition-all shadow-sm">
-                        <i data-lucide="log-out" class="w-5 h-5"></i>
-                    </button>
+                    <button onclick="openConfigModal()" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center hover:bg-slate-700 transition-all text-slate-300"><i data-lucide="settings" class="w-4 h-4"></i></button>
+                    <button onclick="handleLogout()" class="w-8 h-8 rounded-lg bg-rose-900/30 text-rose-400 border border-rose-900/50 flex items-center justify-center hover:bg-rose-900/50 transition-all"><i data-lucide="log-out" class="w-4 h-4"></i></button>
                 </div>
             </div>
         </div>
@@ -140,233 +66,200 @@
     <main class="relative z-10 max-w-7xl mx-auto px-6 pb-20">
         <header class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
             <div class="lg:col-span-2 space-y-4">
-                <div class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-900/30 text-emerald-400 border border-emerald-800/50 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                    <span id="sync-ping" class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-                    <span id="sync-status-label">Conectado</span>
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-slate-900/50 border border-slate-800 rounded-full text-[9px] font-bold uppercase">
+                    <span id="sb-dot" class="w-1.5 h-1.5 bg-slate-600 rounded-full"></span> Supabase Cloud
                 </div>
-                <h1 class="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none">
-                    Base de <span class="gradient-text italic">Datos II.</span>
-                </h1>
+                <h1 class="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none">Base de <span class="gradient-text italic">Datos II.</span></h1>
                 <div class="flex items-center gap-4 pt-2">
-                    <img src="img/perfil.jpg" class="w-12 h-12 rounded-2xl border-2 border-slate-700 shadow-md object-cover" onerror="this.src='https://placehold.co/100x100/7c3aed/ffffff?text=JP'">
+                    <img src="img/perfil.jpg" class="w-12 h-12 rounded-2xl border-2 border-slate-700 object-cover" onerror="this.src='https://placehold.co/100x100/7c3aed/ffffff?text=JP'">
                     <div>
-                        <div class="flex items-center gap-2">
-                            <p class="text-sm font-bold text-slate-100">Atequipa Porta Jhovany</p>
-                            <span id="user-role-label" class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-emerald-900/30 text-emerald-400">Estudiante</span>
-                        </div>
-                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Atequipa Porta Jhovany</p>
+                        <p class="text-sm font-bold text-slate-100 uppercase">Atequipa Porta Jhovany</p>
+                        <p id="user-role-label" class="text-[9px] font-bold text-slate-500 uppercase tracking-[0.2em]">Estudiante</p>
                     </div>
                 </div>
             </div>
-
             <div class="glass-panel rounded-[2.5rem] p-8 flex flex-col justify-between">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-[10px] font-black uppercase text-slate-500 mb-1">Progreso Académico</p>
-                        <h3 id="progress-text" class="text-4xl font-black text-white">0%</h3>
-                    </div>
-                    <div class="w-12 h-12 bg-violet-900/30 rounded-2xl flex items-center justify-center border border-violet-800/30">
-                        <i data-lucide="bar-chart-3" class="w-6 h-6 text-violet-400"></i>
-                    </div>
-                </div>
-                <div class="mt-6">
-                    <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                        <div id="progress-bar" class="h-full bg-gradient-to-r from-violet-600 to-pink-500 transition-all duration-1000 ease-out" style="width: 0%"></div>
-                    </div>
+                <div><p class="text-[10px] font-black uppercase text-slate-500 mb-1">Proceso Academico</p><h3 id="progress-text" class="text-4xl font-black text-white">0%</h3></div>
+                <div class="mt-6 h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-violet-600 to-pink-500 transition-all duration-1000" style="width: 0%"></div>
                 </div>
             </div>
         </header>
 
         <div class="flex items-center gap-4 mb-8">
-            <h2 id="current-unit-title" class="text-xl font-black text-slate-300 tracking-tight uppercase tracking-widest italic">Cargando...</h2>
+            <h2 id="current-unit-title" class="text-xl font-black text-slate-300 uppercase tracking-widest italic">Cargando...</h2>
             <div class="h-[1px] flex-1 bg-slate-800"></div>
         </div>
 
         <div id="main-content" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 min-h-[400px]"></div>
     </main>
 
-    <!-- MODAL VISTA PREVIA (LA VENTANA PEQUEÑA) -->
-    <div id="preview-modal" class="fixed inset-0 z-[500] hidden flex items-center justify-center modal-backdrop p-4 md:p-10 animate-fade-in">
-        <div class="w-full h-full max-w-5xl bg-slate-900 rounded-[2.5rem] shadow-2xl relative flex flex-col border border-slate-800 overflow-hidden">
-            <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-900/80 backdrop-blur-md">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-violet-900/30 rounded-xl flex items-center justify-center border border-violet-800/30">
-                        <i data-lucide="file-text" class="w-5 h-5 text-violet-400"></i>
-                    </div>
-                    <div>
-                        <h3 id="preview-title" class="text-xs font-black text-slate-100 uppercase truncate max-w-[200px]">Archivo</h3>
-                        <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Vista Previa Directa</p>
-                    </div>
+    <!-- MODAL VISTA PREVIA (LA VENTANA INTERNA) -->
+    <div id="preview-modal" class="fixed inset-0 z-[600] hidden flex items-center justify-center modal-backdrop p-2 md:p-6 animate-fade-in">
+        <div class="w-full h-full max-w-6xl bg-slate-900 rounded-[2.5rem] shadow-2xl relative flex flex-col border border-slate-800 overflow-hidden">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/80 backdrop-blur-md">
+                <div class="flex items-center gap-3 ml-2">
+                    <div class="w-8 h-8 bg-violet-600/20 rounded-lg flex items-center justify-center text-violet-400"><i data-lucide="file-text" class="w-4 h-4"></i></div>
+                    <h3 id="preview-title" class="text-xs font-black text-slate-100 uppercase truncate max-w-[300px] tracking-tight">Archivo</h3>
                 </div>
                 <div class="flex items-center gap-2">
-                    <a id="btn-download-preview" href="#" target="_blank" class="p-3 bg-slate-800 text-slate-300 rounded-xl hover:bg-violet-600 hover:text-white transition-all shadow-sm">
-                        <i data-lucide="external-link" class="w-4 h-4"></i>
-                    </a>
-                    <button onclick="closePreviewModal()" class="p-3 bg-rose-900/30 text-rose-400 rounded-xl hover:bg-rose-900/60 transition-all shadow-sm">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
+                    <a id="btn-download-preview" href="#" target="_blank" class="p-2.5 bg-slate-800 text-slate-300 rounded-xl hover:bg-violet-600 transition-all shadow-sm"><i data-lucide="download" class="w-4 h-4"></i></a>
+                    <button onclick="closePreviewModal()" class="p-2.5 bg-rose-900/30 text-rose-400 rounded-xl hover:bg-rose-900/60 transition-all shadow-sm"><i data-lucide="x" class="w-4 h-4"></i></button>
                 </div>
             </div>
-            <div id="preview-body" class="flex-1 bg-slate-950 flex items-center justify-center relative overflow-hidden">
-                <div id="preview-content-area" class="w-full h-full flex items-center justify-center">
-                    <!-- El contenido se inyecta aquí -->
+            <div id="preview-body" class="flex-1 bg-slate-950 p-2 md:p-4 overflow-hidden relative">
+                <div id="preview-content-area" class="preview-content">
+                    <!-- Contenido dinámico aquí -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL SUBIDA -->
-    <div id="upload-modal" class="fixed inset-0 z-[400] hidden flex items-center justify-center modal-backdrop px-6 animate-fade-in">
-        <div class="w-full max-w-md bg-slate-900 rounded-[3rem] p-10 shadow-2xl relative border border-slate-800">
-            <h3 class="text-2xl font-black text-white mb-2 uppercase tracking-tighter">Subir Trabajo</h3>
+    <!-- Modal Subida -->
+    <div id="upload-modal" class="fixed inset-0 z-[400] hidden flex items-center justify-center modal-backdrop px-6">
+        <div class="w-full max-w-md bg-slate-900 rounded-[3rem] p-10 shadow-2xl border border-slate-800">
+            <h3 class="text-2xl font-black text-white mb-2 uppercase tracking-tighter">Añadir Trabajo</h3>
             <p id="modal-week-text" class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mb-8">Semana 1</p>
             <div class="space-y-6">
-                <div>
-                    <label class="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">Título</label>
-                    <input type="text" id="work-title" placeholder="Ej: Laboratorio 01" class="w-full px-6 py-4 bg-slate-800 border border-slate-700 text-white rounded-2xl font-bold text-sm outline-none focus:border-violet-500 transition-all">
-                </div>
+                <div><label class="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">Título del Trabajo</label><input type="text" id="work-title" placeholder="Ej: Laboratorio 01" class="w-full px-6 py-4 bg-slate-800 border border-slate-700 text-white rounded-2xl font-bold text-sm outline-none focus:border-violet-500 transition-all"></div>
                 <div class="p-10 border-4 border-dashed border-slate-800 rounded-[2.5rem] text-center hover:border-violet-800 transition-all cursor-pointer bg-slate-950 group">
                     <input type="file" id="file-input" class="hidden" onchange="updateFileName(this)">
-                    <label for="file-input" class="cursor-pointer block">
-                        <i data-lucide="cloud-upload" class="w-12 h-12 text-slate-700 mx-auto mb-4 group-hover:text-violet-500 transition-all"></i>
-                        <p id="file-name-display" class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Seleccionar Archivo</p>
-                    </label>
+                    <label for="file-input" class="cursor-pointer block"><i data-lucide="cloud-upload" class="w-12 h-12 text-slate-700 mx-auto mb-4 group-hover:text-violet-500 transition-all"></i><p id="file-name-display" class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Seleccionar Archivo</p></label>
                 </div>
-                <div id="upload-status" class="hidden text-center py-2"><p id="upload-status-text" class="text-[10px] font-black uppercase tracking-widest"></p></div>
+                <div id="upload-status" class="hidden text-center py-2"><p id="upload-status-text" class="text-[10px] font-black uppercase text-slate-400 animate-pulse"></p></div>
                 <div class="flex gap-3">
                     <button onclick="closeUploadModal()" class="flex-1 py-4 bg-slate-800 text-slate-400 rounded-2xl font-bold text-xs uppercase tracking-widest">Cerrar</button>
-                    <button id="btn-upload" onclick="handleFileUpload()" class="flex-[2] py-4 bg-violet-600 text-white rounded-2xl font-black text-xs uppercase shadow-lg shadow-violet-900/40 btn-active-scale hover:bg-violet-700 transition-all">Subir Ahora</button>
+                    <button id="btn-upload" onclick="handleFileUpload()" class="flex-[2] py-4 bg-violet-600 text-white rounded-2xl font-black text-xs uppercase shadow-lg hover:bg-violet-700 transition-all">Subir Ahora</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL CONFIRMACIÓN BORRAR -->
-    <div id="confirm-modal" class="fixed inset-0 z-[600] hidden flex items-center justify-center modal-backdrop px-6 animate-fade-in">
-        <div class="w-full max-w-sm bg-slate-900 rounded-[2.5rem] p-8 shadow-2xl border border-slate-800 text-center">
-            <div class="w-16 h-16 bg-rose-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-rose-800/30">
-                <i data-lucide="alert-triangle" class="w-8 h-8 text-rose-500"></i>
-            </div>
-            <h3 class="text-xl font-black text-white uppercase tracking-tighter mb-2">¿Estás seguro?</h3>
-            <p class="text-[11px] text-slate-400 uppercase font-bold tracking-widest mb-8 leading-relaxed">Este trabajo se eliminará permanentemente de la base de datos y del servidor.</p>
-            <div class="flex gap-3">
-                <button onclick="closeConfirmModal()" class="flex-1 py-4 bg-slate-800 text-slate-400 rounded-xl font-black text-[10px] uppercase">No, cancelar</button>
-                <button id="btn-confirm-delete" class="flex-1 py-4 bg-rose-600 text-white rounded-xl font-black text-[10px] uppercase shadow-lg shadow-rose-900/30">Sí, borrar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL LOGIN -->
-    <div id="login-modal" class="fixed inset-0 z-[300] hidden flex items-center justify-center modal-backdrop px-4 animate-fade-in">
-        <div class="w-full max-w-[340px] bg-slate-900 rounded-[2.5rem] p-8 shadow-2xl relative border border-slate-800">
+    <!-- Login -->
+    <div id="login-modal" class="fixed inset-0 z-[600] hidden flex items-center justify-center modal-backdrop px-4">
+        <div class="w-full max-w-[340px] bg-slate-900 rounded-[2.5rem] p-8 border border-slate-800 text-center relative animate-fade-in">
             <button onclick="closeLoginModal()" class="absolute top-6 right-6 text-slate-500 hover:text-slate-300"><i data-lucide="x" class="w-5 h-5"></i></button>
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-violet-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl animate-float">
-                    <i data-lucide="fingerprint" class="w-8 h-8 text-white"></i>
-                </div>
-                <h2 class="text-2xl font-black text-white uppercase tracking-tighter">Administrar</h2>
-            </div>
+            <div class="w-16 h-16 bg-violet-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl"><i data-lucide="fingerprint" class="w-8 h-8 text-white"></i></div>
+            <h2 class="text-2xl font-black text-white uppercase mb-6 italic tracking-tighter">Panel Admin</h2>
             <div class="space-y-3">
-                <input type="text" id="adm-u-fld" placeholder="Usuario" autocomplete="off" class="w-full px-5 py-3 bg-slate-800 border border-slate-700 text-white rounded-xl focus:border-violet-500 outline-none text-sm font-bold transition-all">
-                <input type="password" id="adm-p-fld" placeholder="Contraseña" autocomplete="new-password" class="w-full px-5 py-3 bg-slate-800 border border-slate-700 text-white rounded-xl focus:border-violet-500 outline-none text-sm font-bold transition-all">
-                <button onclick="handleLogin()" class="w-full py-3.5 bg-violet-600 text-white rounded-xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-violet-700 shadow-xl btn-active-scale">Ingresar</button>
+                <input type="text" id="adm-u-fld" placeholder="Usuario" class="w-full px-5 py-3 bg-slate-800 border border-slate-700 text-white rounded-xl outline-none font-bold text-sm focus:border-violet-500 transition-all">
+                <input type="password" id="adm-p-fld" placeholder="Contraseña" class="w-full px-5 py-3 bg-slate-800 border border-slate-700 text-white rounded-xl outline-none font-bold text-sm focus:border-violet-500 transition-all">
+                <p id="login-error-msg" class="hidden text-[10px] font-black text-rose-500 uppercase tracking-widest mt-2">Error de acceso</p>
+                <button onclick="handleLogin()" class="w-full py-4 bg-violet-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-violet-700 shadow-xl transition-all">Ingresar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuración -->
+    <div id="config-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center modal-backdrop px-6">
+        <div class="w-full max-w-lg bg-slate-900 rounded-[3rem] p-10 shadow-2xl border border-slate-800 animate-fade-in">
+            <div class="flex justify-between items-center mb-8"><h3 class="text-2xl font-black text-white uppercase tracking-tighter">Credenciales API</h3><button onclick="closeConfigModal()" class="text-slate-500"><i data-lucide="x" class="w-6 h-6"></i></button></div>
+            <div class="space-y-6">
+                <div><label class="text-[10px] font-black uppercase text-slate-500 mb-1 block">Supabase Project URL</label><input type="text" id="sb-url" placeholder="https://..." class="w-full px-4 py-3 bg-slate-800 border border-slate-700 text-white rounded-xl text-xs outline-none"></div>
+                <div><label class="text-[10px] font-black uppercase text-slate-500 mb-1 block">Supabase Anon Key</label><input type="password" id="sb-key" placeholder="eyJ..." class="w-full px-4 py-3 bg-slate-800 border border-slate-700 text-white rounded-xl text-xs outline-none"></div>
+                <div class="flex gap-2 pt-4">
+                    <button onclick="clearStoredConfig()" class="flex-1 py-4 bg-rose-900/20 text-rose-400 border border-rose-900/50 rounded-2xl font-black text-[10px] uppercase tracking-widest">Limpiar</button>
+                    <button onclick="saveConfig()" class="flex-[2] py-4 bg-violet-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg">Guardar</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURACIÓN SUPABASE ---
-        const SB_CONFIG = {
-            url: 'https://ngeengkwqjbiemesrwkh.supabase.co',
-            key: 'sb_publishable_h7_T2b-jXHsKKtbwacUJIQ_H0nu48bo'
-        };
-
-        const ADMIN_CREDENTIALS = { user: 'admin', pass: 'admin123' };
+        const SB_DEFAULT = { url: 'https://ngeengkwqjbiemesrwkh.supabase.co', key: 'sb_publishable_h7_T2b-jXHsKKtbwacUJIQ_H0nu48bo' };
+        const ADMIN_CRED = { user: 'admin', pass: 'admin123' };
         let currentUser = JSON.parse(localStorage.getItem('db2_session')) || { role: 'STUDENT' };
-        let _supabase = supabase.createClient(SB_CONFIG.url, SB_CONFIG.key);
+        let _supabase = null;
 
-        // Semanas Unidad 1 (según pizarra)
         let units = [
-            { 
-                number: 1, 
-                title: "Introducción a la arquitectura de Base de Datos", 
-                weeks: [
-                    { number: 1, name: "Introducción a la arquitectura de B.D.", completed: false, activities: [], isLoading: true },
-                    { number: 2, name: "Gestores de B.D.", completed: false, activities: [], isLoading: true },
-                    { number: 3, name: "Arquitectura de B.D.", completed: false, activities: [], isLoading: true },
-                    { number: 4, name: "Diseño de la arquitectura de B.D.", completed: false, activities: [], isLoading: true }
-                ]
-            },
-            { number: 2, title: "Programación en Servidor SQL", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 5, name: `Laboratorio SQL ${i+5}`, completed: false, activities: [], isLoading: true })) },
-            { number: 3, title: "Bases de Datos NoSQL y Big Data", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 9, name: `Integración NoSQL ${i+9}`, completed: false, activities: [], isLoading: true })) },
-            { number: 4, title: "Administración y Seguridad", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 13, name: `Auditoría y Backup ${i+13}`, completed: false, activities: [], isLoading: true })) }
+            { number: 1, title: "Introducción a la arquitectura de Base de Datos", weeks: [
+                { number: 1, name: "Introducción a la arquitectura de B.D.", completed: false, activities: [] },
+                { number: 2, name: "Gestores de B.D.", completed: false, activities: [] },
+                { number: 3, name: "Arquitectura de B.D.", completed: false, activities: [] },
+                { number: 4, name: "Diseño de la arquitectura de B.D.", completed: false, activities: [] }
+            ]},
+            { number: 2, title: "Programación en Servidor SQL", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 5, name: `Laboratorio SQL ${i+5}`, completed: false, activities: [] })) },
+            { number: 3, title: "Bases de Datos NoSQL y Big Data", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 9, name: `Integración NoSQL ${i+9}`, completed: false, activities: [] })) },
+            { number: 4, title: "Administración y Seguridad", weeks: Array.from({ length: 4 }, (_, i) => ({ number: i + 13, name: `Auditoría y Backup ${i+13}`, completed: false, activities: [] })) }
         ];
 
         let selectedUnit = 1;
         let currentWeekToUpload = null;
-        let pendingDelete = null;
 
-        // --- SINCRONIZACIÓN ---
+        function sanitizeFilename(name) {
+            return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9.\-_]/g, "_");
+        }
+
+        function getActiveConfig() {
+            let sbUrl = localStorage.getItem('sb_url') || SB_DEFAULT.url;
+            if (sbUrl.includes('/rest/v1')) sbUrl = sbUrl.split('/rest/v1')[0];
+            return {
+                sbUrl: sbUrl.trim().replace(/\/$/, ""),
+                sbKey: (localStorage.getItem('sb_key') || SB_DEFAULT.key).trim()
+            };
+        }
+
+        function initAPIs() {
+            const cfg = getActiveConfig();
+            _supabase = supabase.createClient(cfg.sbUrl, cfg.sbKey);
+            document.getElementById('sb-dot').className = "w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse";
+            syncFromSupabase();
+        }
+
         async function syncFromSupabase() {
             try {
                 const { data, error } = await _supabase.from('trabajos').select('*').order('semana', { ascending: true });
                 if (error) throw error;
-
-                // Reset
-                units.forEach(u => u.weeks.forEach(w => { w.activities = []; w.completed = false; w.isLoading = false; }));
-
+                units.forEach(u => u.weeks.forEach(w => { w.activities = []; w.completed = false; }));
                 data.forEach(item => {
-                    const unit = units.find(u => u.number == item.unidad);
-                    if (unit) {
-                        const week = unit.weeks.find(w => w.number == item.semana);
-                        if (week) {
-                            week.activities.push({ 
-                                id: item.id, 
-                                name: item.titulo_trabajo, 
-                                url: item.url_archivo,
-                                storagePath: item.url_archivo.split('/').pop() 
-                            });
-                            week.completed = true;
+                    const u = units.find(unit => unit.number == item.unidad);
+                    if (u) {
+                        const w = u.weeks.find(week => week.number == item.semana);
+                        if (w) {
+                            w.activities.push({ id: item.id, name: item.titulo_trabajo, url: item.url_archivo, storagePath: item.url_archivo.split('/').pop() });
+                            w.completed = true;
                         }
                     }
                 });
-                document.getElementById('sync-status-label').innerText = "Sincronizado";
-            } catch (e) {
-                document.getElementById('sync-status-label').innerText = "Error API";
-            }
-            renderContent();
-            updateProgress();
+            } catch (e) { console.error(e); }
+            renderContent(); updateProgress();
         }
 
-        // --- VISTA PREVIA (LA PEQUEÑA VENTANA) ---
-        window.openFilePreview = (url, name) => {
+        // --- VISOR DE ARCHIVOS DE ALTA COMPATIBILIDAD ---
+        window.openFilePreview = async (url, name) => {
             const area = document.getElementById('preview-content-area');
-            const ext = name.split('.').pop().toLowerCase();
             document.getElementById('preview-title').innerText = name;
             document.getElementById('btn-download-preview').href = url;
             
-            area.innerHTML = '<div class="flex flex-col items-center gap-4 text-slate-500"><i data-lucide="loader-2" class="w-8 h-8 animate-spin"></i><p class="text-[10px] font-black uppercase tracking-widest">Cargando visor...</p></div>';
-            lucide.createIcons();
+            // Forzar detección de PDF por URL o contenido
+            const isPDF = url.toLowerCase().includes('.pdf') || name.toLowerCase().includes('.pdf');
+            const isIMG = ['jpg', 'jpeg', 'png', 'gif', 'svg'].some(ext => url.toLowerCase().includes('.' + ext));
+            const isCODE = ['sql', 'txt', 'js'].some(ext => url.toLowerCase().includes('.' + ext));
 
-            setTimeout(() => {
-                if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext)) {
-                    area.innerHTML = `<img src="${url}" class="max-w-[90%] max-h-[90%] object-contain rounded-2xl shadow-2xl animate-fade-in">`;
-                } else if (ext === 'pdf') {
-                    // Usar el visor de Google Docs para mayor compatibilidad
-                    const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
-                    area.innerHTML = `<iframe src="${viewerUrl}" class="preview-iframe animate-fade-in"></iframe>`;
-                } else {
-                    area.innerHTML = `
-                        <div class="text-center p-12 glass-panel rounded-[3rem] max-w-sm">
-                            <i data-lucide="file-code" class="w-12 h-12 text-slate-600 mx-auto mb-6"></i>
-                            <p class="text-slate-100 font-bold mb-8 uppercase text-xs tracking-widest leading-relaxed">Este formato (.${ext}) requiere descarga externa.</p>
-                            <a href="${url}" target="_blank" class="px-10 py-4 bg-violet-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg">Abrir en Pestaña</a>
-                        </div>`;
-                }
-                lucide.createIcons();
-            }, 500);
-
+            area.innerHTML = '<div class="text-slate-500 animate-pulse text-[10px] font-black uppercase tracking-widest">Sincronizando Visor...</div>';
             document.getElementById('preview-modal').classList.remove('hidden');
+
+            try {
+                if (isPDF) {
+                    // Visor de Google Docs (El más compatible para PDFs incrustados)
+                    const googleViewer = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
+                    area.innerHTML = `<iframe src="${googleViewer}" class="preview-iframe animate-fade-in"></iframe>`;
+                } 
+                else if (isIMG) {
+                    area.innerHTML = `<img src="${url}" class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl animate-fade-in">`;
+                } 
+                else if (isCODE) {
+                    const response = await fetch(url);
+                    const text = await response.text();
+                    area.innerHTML = `<div class="code-viewer animate-fade-in"><pre class="whitespace-pre-wrap">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre></div>`;
+                }
+                else {
+                    area.innerHTML = `<div class="text-center p-12"><p class="text-white font-bold mb-8 uppercase text-xs">Vista previa no disponible para este formato</p><a href="${url}" target="_blank" class="px-10 py-4 bg-violet-600 text-white rounded-2xl text-[10px] font-black uppercase shadow-lg">Abrir archivo</a></div>`;
+                }
+            } catch (err) {
+                area.innerHTML = `<div class="text-rose-500 text-[10px] font-black uppercase">Error al cargar contenido interno</div>`;
+            }
+            lucide.createIcons();
         };
 
         window.closePreviewModal = () => {
@@ -374,126 +267,97 @@
             document.getElementById('preview-content-area').innerHTML = '';
         };
 
-        // --- ELIMINACIÓN ---
-        window.openDeleteConfirm = (id, path) => {
-            pendingDelete = { id, path };
-            document.getElementById('confirm-modal').classList.remove('hidden');
-            const btn = document.getElementById('btn-confirm-delete');
-            btn.onclick = async () => {
-                btn.disabled = true;
-                btn.innerText = "Borrando...";
-                try {
-                    await _supabase.from('trabajos').delete().eq('id', pendingDelete.id);
-                    if (pendingDelete.path) await _supabase.storage.from('archivos').remove([pendingDelete.path]);
-                    closeConfirmModal();
-                    syncFromSupabase();
-                } catch (e) { console.error(e); }
-                btn.disabled = false;
-                btn.innerText = "Sí, borrar";
-            };
-        };
-
-        window.closeConfirmModal = () => { document.getElementById('confirm-modal').classList.add('hidden'); pendingDelete = null; };
-
-        // --- SUBIDA ---
         window.handleFileUpload = async () => {
-            if (currentUser.role !== 'ADMIN') return;
-            const file = document.getElementById('file-input').files[0];
-            const title = document.getElementById('work-title').value.trim();
-            const status = document.getElementById('upload-status-text');
-            if (!file || !title) return;
+            const fileInput = document.getElementById('file-input');
+            const titleInput = document.getElementById('work-title');
+            const statusText = document.getElementById('upload-status-text');
+
+            if (!fileInput.files[0] || !titleInput.value.trim()) return;
+            const file = fileInput.files[0];
+            const cleanName = sanitizeFilename(file.name);
+            const fileName = `${Date.now()}_${cleanName}`;
 
             document.getElementById('upload-status').classList.remove('hidden');
-            status.innerText = "Subiendo archivo...";
-            const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-
+            
             try {
+                statusText.innerText = "Subiendo archivo...";
                 const { error: upErr } = await _supabase.storage.from('archivos').upload(fileName, file);
                 if (upErr) throw upErr;
                 const { data: pub } = _supabase.storage.from('archivos').getPublicUrl(fileName);
-                const { error: insErr } = await _supabase.from('trabajos').insert([{
-                    unidad: selectedUnit,
-                    semana: currentWeekToUpload,
-                    titulo_trabajo: title,
-                    url_archivo: pub.publicUrl
-                }]);
-                if (insErr) throw insErr;
-                status.innerText = "¡Completado con éxito!";
-                setTimeout(() => { closeUploadModal(); syncFromSupabase(); }, 1000);
-            } catch (e) {
-                status.innerText = "Error: " + e.message;
-            }
+                await _supabase.from('trabajos').insert([{ unidad: selectedUnit, semana: currentWeekToUpload, titulo_trabajo: titleInput.value.trim(), url_archivo: pub.publicUrl }]);
+                statusText.innerText = "¡Subida Exitosa!";
+                setTimeout(() => { closeUploadModal(); syncFromSupabase(); }, 1500);
+            } catch (e) { statusText.innerText = "Error: " + e.message; }
         };
 
-        // --- UI LOGIC ---
-        window.openLoginModal = () => document.getElementById('login-modal').classList.remove('hidden');
-        window.closeLoginModal = () => document.getElementById('login-modal').classList.add('hidden');
-        window.openUploadModal = (n) => {
-            currentWeekToUpload = n;
-            document.getElementById('modal-week-text').innerText = `Semana ${n}`;
-            document.getElementById('upload-modal').classList.remove('hidden');
+        window.handleDeleteWork = async (id, path) => {
+            if (!confirm("¿Deseas eliminar este archivo definitivamente?")) return;
+            await _supabase.from('trabajos').delete().eq('id', id);
+            if (path) await _supabase.storage.from('archivos').remove([path]);
+            syncFromSupabase();
         };
-        window.closeUploadModal = () => document.getElementById('upload-modal').classList.add('hidden');
-        window.updateFileName = (i) => document.getElementById('file-name-display').innerText = i.files[0]?.name || "Seleccionar Archivo";
-        
+
+        window.openLoginModal = () => { document.getElementById('login-modal').classList.remove('hidden'); document.getElementById('adm-u-fld').focus(); };
+        window.closeLoginModal = () => { document.getElementById('login-modal').classList.add('hidden'); };
+
         function handleLogin() {
-            const u = document.getElementById('adm-u-fld').value.toLowerCase();
-            const p = document.getElementById('adm-p-fld').value;
-            if (u === ADMIN_CREDENTIALS.user && p === ADMIN_CREDENTIALS.pass) {
-                currentUser = { role: 'ADMIN' };
-                localStorage.setItem('db2_session', JSON.stringify(currentUser));
-                updateUserUI(); closeLoginModal();
-            }
+            const u = document.getElementById('adm-u-fld').value.trim().toLowerCase();
+            const p = document.getElementById('adm-p-fld').value.trim();
+            if (u === ADMIN_CRED.user && p === ADMIN_CRED.pass) {
+                localStorage.setItem('db2_session', JSON.stringify({ role: 'ADMIN' }));
+                location.reload(); 
+            } else { document.getElementById('login-error-msg').classList.remove('hidden'); }
         }
-        function handleLogout() { localStorage.setItem('db2_session', JSON.stringify({ role: 'STUDENT' })); location.reload(); }
-        
-        function updateUserUI() {
-            const isAdm = currentUser.role === 'ADMIN';
-            document.getElementById('admin-controls').classList.toggle('hidden', !isAdm);
-            document.getElementById('btn-show-login').classList.toggle('hidden', isAdm);
-            document.getElementById('user-role-label').innerText = isAdm ? 'Administrador' : 'Estudiante';
-            renderContent();
-        }
+
+        window.handleLogout = () => { localStorage.removeItem('db2_session'); location.reload(); };
+        window.saveConfig = () => {
+            localStorage.setItem('sb_url', document.getElementById('sb-url').value.trim());
+            localStorage.setItem('sb_key', document.getElementById('sb-key').value.trim());
+            location.reload();
+        };
+        window.openConfigModal = () => {
+            const cfg = getActiveConfig();
+            document.getElementById('sb-url').value = cfg.sbUrl; document.getElementById('sb-key').value = cfg.sbKey;
+            document.getElementById('config-modal').classList.remove('hidden');
+        };
+        window.clearStoredConfig = () => { localStorage.clear(); location.reload(); };
+        window.openUploadModal = (n) => { currentWeekToUpload = n; document.getElementById('modal-week-text').innerText = `Semana ${n}`; document.getElementById('upload-modal').classList.remove('hidden'); };
+        window.closeUploadModal = () => { document.getElementById('upload-modal').classList.add('hidden'); document.getElementById('upload-status').classList.add('hidden'); };
+        window.updateFileName = (i) => document.getElementById('file-name-display').innerText = i.files[0]?.name || "Seleccionar Archivo";
+        window.changeUnit = (n) => { selectedUnit = n; renderTabs(); renderContent(); };
 
         function renderTabs() {
-            const tabsHtml = units.map(u => `<button onclick="changeUnit(${u.number})" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedUnit === u.number ? 'bg-slate-700 text-violet-400 shadow-sm border border-slate-600' : 'text-slate-500 hover:text-slate-300'}">Unidad ${u.number}</button>`).join('');
-            document.getElementById('unit-tabs-container').innerHTML = tabsHtml;
+            const tabs = units.map(u => `<button onclick="changeUnit(${u.number})" class="px-5 py-2 rounded-xl text-[9px] font-black uppercase transition-all ${selectedUnit === u.number ? 'bg-slate-700 text-violet-400 border border-slate-600 shadow-xl' : 'text-slate-500 hover:text-slate-300'}">Unidad ${u.number}</button>`).join('');
+            document.getElementById('unit-tabs-container').innerHTML = tabs;
         }
 
         function renderContent() {
             const container = document.getElementById('main-content');
-            if(!container) return;
             const unit = units.find(u => u.number === selectedUnit);
             const isAdm = currentUser.role === 'ADMIN';
             document.getElementById('current-unit-title').innerText = unit.title;
             container.innerHTML = unit.weeks.map(w => `
-                <div class="glass-panel p-8 rounded-[2.5rem] card-hover flex flex-col min-h-[420px] group relative overflow-hidden animate-fade-in">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-violet-600/5 blur-3xl -mr-16 -mt-16 group-hover:bg-violet-600/10 transition-colors"></div>
+                <div class="glass-panel p-8 rounded-[2.5rem] card-hover flex flex-col min-h-[420px] relative overflow-hidden animate-fade-in">
                     <div class="flex justify-between items-start mb-6">
-                        <div><span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Semana</span><h3 class="text-6xl font-black text-white group-hover:gradient-text transition-all">${w.number}</h3></div>
-                        ${isAdm ? `<button onclick="openUploadModal(${w.number})" class="w-11 h-11 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-violet-400 flex items-center justify-center transition-all hover:scale-110 shadow-sm"><i data-lucide="plus"></i></button>` : ''}
+                        <div><span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Semana</span><h3 class="text-6xl font-black text-white leading-none">${w.number}</h3></div>
+                        ${isAdm ? `<button onclick="openUploadModal(${w.number})" class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-violet-400 flex items-center justify-center transition-all shadow-sm"><i data-lucide="plus"></i></button>` : ''}
                     </div>
                     <p class="text-[11px] font-extrabold text-slate-300 mb-8 uppercase leading-snug min-h-[32px] tracking-tight">${w.name}</p>
                     <div class="flex-1 space-y-3 overflow-y-auto no-scrollbar max-h-[160px] mb-8 pr-1">
-                        ${w.isLoading ? '<div class="h-10 shimmer rounded-xl"></div>' :
-                        (w.activities && w.activities.length > 0 ? w.activities.map(a => `
+                        ${w.activities.length > 0 ? w.activities.map(a => `
                             <div class="flex gap-1 group/item">
-                                <button onclick="openFilePreview('${a.url}', '${a.name}')" class="flex-1 flex items-center gap-3 p-3 bg-slate-950 border border-slate-800 rounded-xl hover:border-violet-500/50 transition-all text-left shadow-lg truncate">
-                                    <i data-lucide="file-text" class="w-4 h-4 text-violet-400"></i>
-                                    <span class="text-[9px] font-bold text-white uppercase truncate font-mono">${a.name}</span>
+                                <button onclick="openFilePreview('${a.url}', '${a.name}')" class="flex-1 flex items-center gap-3 p-3 bg-slate-950 border border-slate-800 rounded-xl hover:border-violet-500/50 transition-all text-left truncate shadow-lg">
+                                    <i data-lucide="file-text" class="w-3 h-3 text-violet-400"></i>
+                                    <span class="text-[8px] font-bold text-white uppercase truncate font-mono">${a.name}</span>
                                 </button>
-                                ${isAdm ? `
-                                <button onclick="openDeleteConfirm('${a.id}', '${a.storagePath}')" class="w-10 bg-rose-900/20 text-rose-500 border border-rose-900/30 rounded-xl hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center" title="Borrar">
-                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                                </button>` : ''}
-                            </div>`).join('') : '<div class="flex flex-col items-center justify-center py-6 opacity-50"><p class="text-[8px] font-black uppercase">Vacío</p></div>')}
+                                ${isAdm ? `<button onclick="handleDeleteWork('${a.id}', '${a.storagePath}')" class="w-9 h-auto bg-rose-900/20 text-rose-500 border border-rose-900/30 rounded-xl hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center"><i data-lucide="trash-2" class="w-3 h-3"></i></button>` : ''}
+                            </div>`).join('') : '<div class="flex flex-col items-center justify-center py-6 opacity-30 text-slate-600"><i data-lucide="inbox" class="w-6 h-6 mb-2"></i><p class="text-[7px] font-black uppercase">Vacío</p></div>'}
                     </div>
-                    <div class="w-full py-4 ${w.completed ? 'bg-emerald-900/20 text-emerald-400 border-emerald-900/50' : 'bg-slate-800/30 text-slate-500 border-slate-800/50'} rounded-[1.5rem] border text-[10px] font-black uppercase flex items-center justify-center gap-3 transition-all"><div class="w-2 h-2 rounded-full ${w.completed ? 'bg-emerald-500 animate-pulse' : 'bg-slate-700'}"></div>${w.completed ? 'Completado' : 'Pendiente'}</div>
+                    <div class="w-full py-4 ${w.completed ? 'bg-emerald-900/10 text-emerald-400 border-emerald-900/30' : 'bg-slate-800/30 text-slate-500 border-slate-800/50'} rounded-[1.5rem] border text-[9px] font-black uppercase flex items-center justify-center gap-3 transition-all"><div class="w-1.5 h-1.5 rounded-full ${w.completed ? 'bg-emerald-500 animate-pulse' : 'bg-slate-700'}"></div>${w.completed ? 'Completado' : 'Pendiente'}</div>
                 </div>`).join('');
             lucide.createIcons();
         }
 
-        window.changeUnit = (n) => { selectedUnit = n; renderTabs(); renderContent(); };
         function updateProgress() { 
             const completed = units.reduce((acc, u) => acc + u.weeks.filter(w => w.completed).length, 0);
             const p = Math.round((completed / 16) * 100);
@@ -501,7 +365,15 @@
             document.getElementById('progress-bar').style.width = p + '%';
         }
 
-        window.onload = () => { updateUserUI(); renderTabs(); syncFromSupabase(); };
+        window.onload = () => { 
+            if(currentUser.role === 'ADMIN') {
+                document.getElementById('admin-controls').classList.remove('hidden');
+                document.getElementById('btn-show-login').classList.add('hidden');
+                document.getElementById('user-role-label').innerText = 'Administrador';
+                document.getElementById('user-role-label').className = 'text-[9px] font-black text-violet-400 uppercase tracking-[0.2em]';
+            }
+            renderTabs(); initAPIs(); 
+        };
     </script>
 </body>
 </html>
