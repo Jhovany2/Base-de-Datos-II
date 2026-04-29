@@ -22,7 +22,20 @@
         .card-hover:hover { transform: translateY(-6px); background: rgba(30, 41, 59, 0.9); border-color: rgba(139, 92, 246, 0.4); }
         .gradient-text { background: linear-gradient(135deg, #818cf8 0%, #a78bfa 50%, #f472b6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* Visor Interno Optimizado */
+        /* Animaciones para el Logo del Login */
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+        
+        .login-logo-interactive {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .login-logo-interactive:hover {
+            transform: scale(1.15) rotate(10deg);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
+            cursor: pointer;
+        }
+
+        /* Visor Interno */
         .preview-content { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #020617; border-radius: 1rem; overflow: hidden; }
         .preview-iframe { width: 100%; height: 100%; border: none; background: white; }
         .code-viewer { width: 100%; height: 100%; background: #020617; padding: 1.5rem; color: #94a3b8; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5; }
@@ -30,6 +43,7 @@
         .modal-backdrop { background: rgba(2, 6, 23, 0.96); backdrop-filter: blur(20px); }
         .animate-fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        .btn-active-scale:active { transform: scale(0.95); }
     </style>
 </head>
 <body class="overflow-x-hidden">
@@ -54,7 +68,7 @@
             <div id="unit-tabs-container" class="flex gap-1 bg-slate-800/50 p-1 rounded-2xl hidden md:flex"></div>
 
             <div class="flex items-center gap-3">
-                <button id="btn-show-login" onclick="openLoginModal()" class="px-3 py-1.5 bg-slate-100 text-slate-900 rounded-lg text-[9px] font-bold uppercase hover:bg-violet-400 transition-all">Panel de Admin</button>
+                <button id="btn-show-login" onclick="openLoginModal()" class="px-3 py-1.5 bg-slate-100 text-slate-900 rounded-lg text-[9px] font-bold uppercase hover:bg-violet-400 hover:text-white transition-all btn-active-scale">Acceso Admin</button>
                 <div id="admin-controls" class="hidden flex items-center gap-2">
                     <button onclick="openConfigModal()" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center hover:bg-slate-700 transition-all text-slate-300"><i data-lucide="settings" class="w-4 h-4"></i></button>
                     <button onclick="handleLogout()" class="w-8 h-8 rounded-lg bg-rose-900/30 text-rose-400 border border-rose-900/50 flex items-center justify-center hover:bg-rose-900/50 transition-all"><i data-lucide="log-out" class="w-4 h-4"></i></button>
@@ -79,7 +93,7 @@
                 </div>
             </div>
             <div class="glass-panel rounded-[2.5rem] p-8 flex flex-col justify-between">
-                <div><p class="text-[10px] font-black uppercase text-slate-500 mb-1">Proceso Academico</p><h3 id="progress-text" class="text-4xl font-black text-white">0%</h3></div>
+                <div><p class="text-[10px] font-black uppercase text-slate-500 mb-1">Proceso del Ciclo</p><h3 id="progress-text" class="text-4xl font-black text-white">0%</h3></div>
                 <div class="mt-6 h-2 w-full bg-slate-800 rounded-full overflow-hidden">
                     <div id="progress-bar" class="h-full bg-gradient-to-r from-violet-600 to-pink-500 transition-all duration-1000" style="width: 0%"></div>
                 </div>
@@ -94,8 +108,8 @@
         <div id="main-content" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 min-h-[400px]"></div>
     </main>
 
-    <!-- MODAL VISTA PREVIA (LA VENTANA INTERNA) -->
-    <div id="preview-modal" class="fixed inset-0 z-[600] hidden flex items-center justify-center modal-backdrop p-2 md:p-6 animate-fade-in">
+    <!-- MODAL VISTA PREVIA -->
+    <div id="preview-modal" class="fixed inset-0 z-[600] hidden flex items-center justify-center modal-backdrop p-4 md:p-10 animate-fade-in">
         <div class="w-full h-full max-w-6xl bg-slate-900 rounded-[2.5rem] shadow-2xl relative flex flex-col border border-slate-800 overflow-hidden">
             <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/80 backdrop-blur-md">
                 <div class="flex items-center gap-3 ml-2">
@@ -108,16 +122,14 @@
                 </div>
             </div>
             <div id="preview-body" class="flex-1 bg-slate-950 p-2 md:p-4 overflow-hidden relative">
-                <div id="preview-content-area" class="preview-content">
-                    <!-- Contenido dinámico aquí -->
-                </div>
+                <div id="preview-content-area" class="preview-content"></div>
             </div>
         </div>
     </div>
 
     <!-- Modal Subida -->
     <div id="upload-modal" class="fixed inset-0 z-[400] hidden flex items-center justify-center modal-backdrop px-6">
-        <div class="w-full max-w-md bg-slate-900 rounded-[3rem] p-10 shadow-2xl border border-slate-800">
+        <div class="w-full max-w-md bg-slate-900 rounded-[3rem] p-10 shadow-2xl border border-slate-800 animate-fade-in">
             <h3 class="text-2xl font-black text-white mb-2 uppercase tracking-tighter">Añadir Trabajo</h3>
             <p id="modal-week-text" class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mb-8">Semana 1</p>
             <div class="space-y-6">
@@ -135,17 +147,26 @@
         </div>
     </div>
 
-    <!-- Login -->
+    <!-- Login (CON LOGO INTERACTIVO Y SIN AUTOFILL) -->
     <div id="login-modal" class="fixed inset-0 z-[600] hidden flex items-center justify-center modal-backdrop px-4">
-        <div class="w-full max-w-[340px] bg-slate-900 rounded-[2.5rem] p-8 border border-slate-800 text-center relative animate-fade-in">
-            <button onclick="closeLoginModal()" class="absolute top-6 right-6 text-slate-500 hover:text-slate-300"><i data-lucide="x" class="w-5 h-5"></i></button>
-            <div class="w-16 h-16 bg-violet-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl"><i data-lucide="fingerprint" class="w-8 h-8 text-white"></i></div>
-            <h2 class="text-2xl font-black text-white uppercase mb-6 italic tracking-tighter">Panel Admin</h2>
+        <div class="w-full max-w-[340px] bg-slate-900 rounded-[2.5rem] p-8 border border-slate-800 text-center relative animate-fade-in shadow-2xl">
+            <button onclick="closeLoginModal()" class="absolute top-6 right-6 text-slate-500 hover:text-slate-300 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+            
+            <!-- Logo Interactivo -->
+            <div class="w-16 h-16 bg-violet-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl animate-float login-logo-interactive group">
+                <i data-lucide="fingerprint" class="w-8 h-8 text-white"></i>
+            </div>
+            
+            <h2 class="text-2xl font-black text-white uppercase mb-6 italic tracking-tighter text-center">Gestión Admin</h2>
             <div class="space-y-3">
-                <input type="text" id="adm-u-fld" placeholder="Usuario" class="w-full px-5 py-3 bg-slate-800 border border-slate-700 text-white rounded-xl outline-none font-bold text-sm focus:border-violet-500 transition-all">
-                <input type="password" id="adm-p-fld" placeholder="Contraseña" class="w-full px-5 py-3 bg-slate-800 border border-slate-700 text-white rounded-xl outline-none font-bold text-sm focus:border-violet-500 transition-all">
+                <!-- autocomplete="off" para evitar relleno automático -->
+                <input type="text" id="adm-u-fld" placeholder="Usuario" autocomplete="off" class="w-full px-5 py-3 bg-slate-800 border border-slate-700 text-white rounded-xl outline-none font-bold text-sm focus:border-violet-500 transition-all">
+                
+                <!-- autocomplete="new-password" suele bloquear gestores de contraseñas -->
+                <input type="password" id="adm-p-fld" placeholder="Contraseña" autocomplete="new-password" class="w-full px-5 py-3 bg-slate-800 border border-slate-700 text-white rounded-xl outline-none font-bold text-sm focus:border-violet-500 transition-all">
+                
                 <p id="login-error-msg" class="hidden text-[10px] font-black text-rose-500 uppercase tracking-widest mt-2">Error de acceso</p>
-                <button onclick="handleLogin()" class="w-full py-4 bg-violet-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-violet-700 shadow-xl transition-all">Ingresar</button>
+                <button onclick="handleLogin()" class="w-full py-4 bg-violet-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-violet-700 shadow-xl transition-all btn-active-scale">Ingresar</button>
             </div>
         </div>
     </div>
@@ -166,9 +187,11 @@
     </div>
 
     <script>
+        // --- CONFIGURACIÓN ---
         const SB_DEFAULT = { url: 'https://ngeengkwqjbiemesrwkh.supabase.co', key: 'sb_publishable_h7_T2b-jXHsKKtbwacUJIQ_H0nu48bo' };
         const ADMIN_CRED = { user: 'admin', pass: 'admin123' };
-        let currentUser = JSON.parse(localStorage.getItem('db2_session')) || { role: 'STUDENT' };
+        
+        let currentUser = JSON.parse(sessionStorage.getItem('db2_session')) || { role: 'STUDENT' };
         let _supabase = null;
 
         let units = [
@@ -225,36 +248,29 @@
             renderContent(); updateProgress();
         }
 
-        // --- VISOR DE ARCHIVOS DE ALTA COMPATIBILIDAD ---
         window.openFilePreview = async (url, name) => {
             const area = document.getElementById('preview-content-area');
             document.getElementById('preview-title').innerText = name;
             document.getElementById('btn-download-preview').href = url;
-            
-            // Forzar detección de PDF por URL o contenido
-            const isPDF = url.toLowerCase().includes('.pdf') || name.toLowerCase().includes('.pdf');
-            const isIMG = ['jpg', 'jpeg', 'png', 'gif', 'svg'].some(ext => url.toLowerCase().includes('.' + ext));
-            const isCODE = ['sql', 'txt', 'js'].some(ext => url.toLowerCase().includes('.' + ext));
-
+            const urlPath = url.split('?')[0];
+            const ext = urlPath.split('.').pop().toLowerCase();
             area.innerHTML = '<div class="text-slate-500 animate-pulse text-[10px] font-black uppercase tracking-widest">Sincronizando Visor...</div>';
             document.getElementById('preview-modal').classList.remove('hidden');
-
             try {
-                if (isPDF) {
-                    // Visor de Google Docs (El más compatible para PDFs incrustados)
+                if (ext === 'pdf') {
                     const googleViewer = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
                     area.innerHTML = `<iframe src="${googleViewer}" class="preview-iframe animate-fade-in"></iframe>`;
                 } 
-                else if (isIMG) {
+                else if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext)) {
                     area.innerHTML = `<img src="${url}" class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl animate-fade-in">`;
                 } 
-                else if (isCODE) {
+                else if (['sql', 'txt', 'js', 'json'].includes(ext)) {
                     const response = await fetch(url);
                     const text = await response.text();
                     area.innerHTML = `<div class="code-viewer animate-fade-in"><pre class="whitespace-pre-wrap">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre></div>`;
                 }
                 else {
-                    area.innerHTML = `<div class="text-center p-12"><p class="text-white font-bold mb-8 uppercase text-xs">Vista previa no disponible para este formato</p><a href="${url}" target="_blank" class="px-10 py-4 bg-violet-600 text-white rounded-2xl text-[10px] font-black uppercase shadow-lg">Abrir archivo</a></div>`;
+                    area.innerHTML = `<div class="text-center p-12"><p class="text-white font-bold mb-8 uppercase text-xs">Formato no soportado en ventana</p><a href="${url}" target="_blank" class="px-10 py-4 bg-violet-600 text-white rounded-2xl text-[10px] font-black uppercase shadow-lg">Abrir archivo</a></div>`;
                 }
             } catch (err) {
                 area.innerHTML = `<div class="text-rose-500 text-[10px] font-black uppercase">Error al cargar contenido interno</div>`;
@@ -262,23 +278,17 @@
             lucide.createIcons();
         };
 
-        window.closePreviewModal = () => {
-            document.getElementById('preview-modal').classList.add('hidden');
-            document.getElementById('preview-content-area').innerHTML = '';
-        };
+        window.closePreviewModal = () => { document.getElementById('preview-modal').classList.add('hidden'); document.getElementById('preview-content-area').innerHTML = ''; };
 
         window.handleFileUpload = async () => {
             const fileInput = document.getElementById('file-input');
             const titleInput = document.getElementById('work-title');
             const statusText = document.getElementById('upload-status-text');
-
             if (!fileInput.files[0] || !titleInput.value.trim()) return;
             const file = fileInput.files[0];
             const cleanName = sanitizeFilename(file.name);
             const fileName = `${Date.now()}_${cleanName}`;
-
             document.getElementById('upload-status').classList.remove('hidden');
-            
             try {
                 statusText.innerText = "Subiendo archivo...";
                 const { error: upErr } = await _supabase.storage.from('archivos').upload(fileName, file);
@@ -297,30 +307,44 @@
             syncFromSupabase();
         };
 
-        window.openLoginModal = () => { document.getElementById('login-modal').classList.remove('hidden'); document.getElementById('adm-u-fld').focus(); };
-        window.closeLoginModal = () => { document.getElementById('login-modal').classList.add('hidden'); };
+        // --- MANEJO DE LOGIN MEJORADO ---
+        window.openLoginModal = () => { 
+            // Limpiamos los campos manualmente para evitar autofill persistente
+            document.getElementById('adm-u-fld').value = '';
+            document.getElementById('adm-p-fld').value = '';
+            document.getElementById('login-modal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('adm-u-fld').focus(), 100);
+        };
+        
+        window.closeLoginModal = () => { 
+            document.getElementById('login-modal').classList.add('hidden'); 
+            document.getElementById('login-error-msg').classList.add('hidden');
+        };
 
         function handleLogin() {
             const u = document.getElementById('adm-u-fld').value.trim().toLowerCase();
             const p = document.getElementById('adm-p-fld').value.trim();
             if (u === ADMIN_CRED.user && p === ADMIN_CRED.pass) {
-                localStorage.setItem('db2_session', JSON.stringify({ role: 'ADMIN' }));
+                sessionStorage.setItem('db2_session', JSON.stringify({ role: 'ADMIN' }));
                 location.reload(); 
             } else { document.getElementById('login-error-msg').classList.remove('hidden'); }
         }
 
-        window.handleLogout = () => { localStorage.removeItem('db2_session'); location.reload(); };
+        window.handleLogout = () => { sessionStorage.removeItem('db2_session'); location.reload(); };
+        
         window.saveConfig = () => {
             localStorage.setItem('sb_url', document.getElementById('sb-url').value.trim());
             localStorage.setItem('sb_key', document.getElementById('sb-key').value.trim());
             location.reload();
         };
+        
         window.openConfigModal = () => {
             const cfg = getActiveConfig();
             document.getElementById('sb-url').value = cfg.sbUrl; document.getElementById('sb-key').value = cfg.sbKey;
             document.getElementById('config-modal').classList.remove('hidden');
         };
-        window.clearStoredConfig = () => { localStorage.clear(); location.reload(); };
+
+        window.clearStoredConfig = () => { localStorage.clear(); sessionStorage.clear(); location.reload(); };
         window.openUploadModal = (n) => { currentWeekToUpload = n; document.getElementById('modal-week-text').innerText = `Semana ${n}`; document.getElementById('upload-modal').classList.remove('hidden'); };
         window.closeUploadModal = () => { document.getElementById('upload-modal').classList.add('hidden'); document.getElementById('upload-status').classList.add('hidden'); };
         window.updateFileName = (i) => document.getElementById('file-name-display').innerText = i.files[0]?.name || "Seleccionar Archivo";
@@ -353,7 +377,7 @@
                                 ${isAdm ? `<button onclick="handleDeleteWork('${a.id}', '${a.storagePath}')" class="w-9 h-auto bg-rose-900/20 text-rose-500 border border-rose-900/30 rounded-xl hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center"><i data-lucide="trash-2" class="w-3 h-3"></i></button>` : ''}
                             </div>`).join('') : '<div class="flex flex-col items-center justify-center py-6 opacity-30 text-slate-600"><i data-lucide="inbox" class="w-6 h-6 mb-2"></i><p class="text-[7px] font-black uppercase">Vacío</p></div>'}
                     </div>
-                    <div class="w-full py-4 ${w.completed ? 'bg-emerald-900/10 text-emerald-400 border-emerald-900/30' : 'bg-slate-800/30 text-slate-500 border-slate-800/50'} rounded-[1.5rem] border text-[9px] font-black uppercase flex items-center justify-center gap-3 transition-all"><div class="w-1.5 h-1.5 rounded-full ${w.completed ? 'bg-emerald-500 animate-pulse' : 'bg-slate-700'}"></div>${w.completed ? 'Completado' : 'Pendiente'}</div>
+                    <div class="w-full py-4 ${w.completed ? 'bg-emerald-900/10 text-emerald-400 border-emerald-900/30' : 'bg-slate-800/30 text-slate-500 border-slate-800/50'} rounded-[1.5rem] border text-[9px] font-black uppercase flex items-center justify-center gap-3 transition-all"><div class="w-1.5 h-1.5 rounded-full ${w.completed ? 'bg-emerald-500 animate-pulse' : 'bg-slate-700'}"></div>${w.completed ? 'Entregado' : 'Pendiente'}</div>
                 </div>`).join('');
             lucide.createIcons();
         }
@@ -371,6 +395,11 @@
                 document.getElementById('btn-show-login').classList.add('hidden');
                 document.getElementById('user-role-label').innerText = 'Administrador';
                 document.getElementById('user-role-label').className = 'text-[9px] font-black text-violet-400 uppercase tracking-[0.2em]';
+            } else {
+                document.getElementById('admin-controls').classList.add('hidden');
+                document.getElementById('btn-show-login').classList.remove('hidden');
+                document.getElementById('user-role-label').innerText = 'Estudiante';
+                document.getElementById('user-role-label').className = 'text-[9px] font-bold text-slate-500 uppercase tracking-[0.2em]';
             }
             renderTabs(); initAPIs(); 
         };
